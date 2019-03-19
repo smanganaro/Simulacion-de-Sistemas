@@ -12,9 +12,7 @@ public class CicleGrid extends Grid {
         int[][] np = {{-1,0},{-1,1},{0,1},{1,1}};
 
         for(int i=0; i<getM(); i++){
-
             for(int j=0; j<getM(); j++){
-
                 for(int n = 0; n < np.length;n++){
                     CellIndex cellIndex = calculateCircularPosition(i + np[n][0],j + np[n][1],getM());
                     if(cellIndex != null)
@@ -24,7 +22,7 @@ public class CicleGrid extends Grid {
         }
     }
 
-    public boolean isValidIndex(int index, int m){
+    private boolean isValidIndex(int index, int m){
         return (index >= 0 && index < m);
     }
 
@@ -32,9 +30,12 @@ public class CicleGrid extends Grid {
         boolean validX = isValidIndex(x,m);
         boolean validY = isValidIndex(y,m);
 
-        //Elimino diagonales
-        if(validX == false && validY == false)
-            return null;
+        if(validX == true && validY == true)
+            return new CellIndex(x,y);
+
+        //Elimino diagonales (LAS DIAGONALES VAN)
+        //if(validX == false && validY == false)
+        //    return null;
 
         return new CellIndex(x%m, y%m);
     }

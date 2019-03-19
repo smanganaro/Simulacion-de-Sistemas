@@ -37,11 +37,14 @@ public abstract class Grid {
         return cells[x][y];
     }
 
-    private void insertParticles(List<Particle> particles){
+    public void insertParticles(List<Particle> particles){
         for(Particle p: particles){
-            int x = (int) (Math.floor(p.getPosition().getX()/(L/M)));
-            int y = (int) (Math.floor(p.getPosition().getY()/(L/M)));
-            cells[x][y].getParticles().add(p);
+            insertParticle(p);
         }
+    }
+    public void insertParticle(Particle p){
+        int x = (int) (Math.floor(p.getPosition().getX()/(L/M)));
+        int y = (int) (Math.floor(p.getPosition().getY()/(L/M)));
+        cells[x][y].getParticles().add(p);
     }
 }

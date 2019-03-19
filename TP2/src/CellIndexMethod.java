@@ -3,74 +3,60 @@ import java.util.*;
 public class CellIndexMethod {
 
     private Grid grid;
-    private Map<Particle, List<Particle>> particlesMapped;
-    private Double timer;
-    private Double interval;
     private Double Rc;
 
-
-    public CellIndexMethod(Grid grid, double timer, double interval, double Rc ) {
-        if(timer<0 || interval<0 || interval>timer){
-            throw new IllegalArgumentException("Invalid time parameters");
-        }
+    public CellIndexMethod(Grid grid, double Rc ) {
         if(Rc<0){
             throw new IllegalArgumentException("Invalid interaction radius");
         }
-        this.particlesMapped = new HashMap<>();
+
         this.grid=grid;
-        this.interval= interval;
         this.Rc = Rc;
 
     }
 
-    public void run() {
+    public Grid getGrid() {
+        return grid;
+    }
+
+    public Double getRc() {
+        return Rc;
+    }
+
+    public Map<Particle, List<Particle>> getParticlesMapped() {
         Integer M = grid.getM();
+        Map<Particle, List<Particle>> particlesMapped = new HashMap<>();
 
         for(int i=0; i<M; i++){
-
             for (int j=0; j<M; j++){
-
                 for(Particle p : grid.getCell(i,j).getParticles()){
                     //Particulas en mi celda
-                    for (Particle q: grid.getCell(i,j).getParticles()){
-
-                        if(!p.equals(q)){
-                            if(calculateDistance(p,q)<=Rc){
-                                addToMap(p,q);
+                    for (Particle q: grid.getCell(i,j).getParticles()) {
+                        if (!p.equals(q)) {
+                            if (calculateDistance(p, q) <= Rc) {
+                                addToMap(p, q, particlesMapped);
                             }
                         }
                     }
-
                     //Particulas en celdas adyacentes
                     for(Cell neighbour : grid.getCell(i,j).getNeighbours()){
-
                         for(Particle q : neighbour.getParticles()){
-
                             if(calculateDistance(p,q)<=Rc){
                                 //Agrego ambas para aprovecharme de la simetria
-                                addToMap(p,q);
-                                addToMap(q,p);
+                                addToMap(p,q,particlesMapped);
+                                addToMap(q,p,particlesMapped);
                             }
                         }
                     }
                 }
             }
         }
-       // printParticlesNeighborsCount();
+       // printParticlesNeighborsCount(particlesMapped); DEBUG
+        return particlesMapped;
     }
 
-    private void printParticlesNeighborsCount(){
-        for (Map.Entry<Particle, List<Particle>> entry : particlesMapped.entrySet()) {
-            StringBuilder stringBuilder = new StringBuilder();
-            for(Particle p: entry.getValue()){
-                stringBuilder.append(p);
-                stringBuilder.append(',');
-            }
-            System.out.println(entry.getKey() + " has {" +stringBuilder.toString()+"} neighbors");
-        }
-    }
 
-    private void addToMap(Particle p, Particle q) {
+    private void addToMap(Particle p, Particle q, Map<Particle, List<Particle>> particlesMapped) {
         if(!particlesMapped.containsKey(p)){
             particlesMapped.put(p, new ArrayList<Particle>());
         }
@@ -78,14 +64,51 @@ public class CellIndexMethod {
 
     }
 
-    /*public void simulate(){
-        Double time = 0.0;
-        while (time<=timer){
-            time += interval;
-            cellIndexrun();
-        }
-    }*/
     private double calculateDistance(Particle p, Particle q) {
-        return Math.sqrt(Math.pow(p.getPosition().getX()-q.getPosition().getX(), 2) + Math.pow(p.getPosition().getY()-q.getPosition().getY(), 2))-p.getRadius()-q.getRadius();
+        return Math.sqrt(Math.pow(p.getPosition().getX()-q.getPosition().getX(), 2) +
+                Math.pow(p.getPosition().getY()-q.getPosition().getY(), 2))-p.getRadius()-q.getRadius();
+    }
+
+    public void updatePosition(Particle p, Double interval){
+        double cellLength = grid.getL()/grid.getM();
+        double prevX = p.getPosition().getX();
+        double prevY = p.getPosition().getY();
+        p.updatePos(interval);
+        double newX = p.getPosition().getX();
+        double newY = p.getPosition().getY();
+
+        int cellX = (int) Math.floor(prevX/cellLength);
+        int cellY = (int) Math.floor(prevY/cellLength);
+
+        int newCellX = (int)Math.floor(newX/cellLength);
+        int newCellY = (int)Math.floor(newY/cellLength);
+        if(newCellX != cellX ||newCellY != cellY){
+            grid.getCell(cellX, cellY).getParticles().remove(p);
+
+            if(isValidCellIndex(cellX, grid.getM())){
+                newX = (newX % grid.getL());
+            }
+            if(isValidCellIndex(cellY, grid.getM())){
+                newY = (newY % grid.getL());
+            }
+
+            p.setPosition(newX, newY);
+            grid.insertParticle(p);
+        }
+    }
+
+    private boolean isValidCellIndex(int index, int m){
+        return (index >= 0 && index < m);
+    }
+
+    private void printParticlesNeighborsCount(Map<Particle, List<Particle>> particlesMapped){
+        for (Map.Entry<Particle, List<Particle>> entry : particlesMapped.entrySet()) {
+            StringBuilder stringBuilder = new StringBuilder();
+            for(Particle pe: entry.getValue()){
+                stringBuilder.append(pe);
+                stringBuilder.append(',');
+            }
+            System.out.println(entry.getKey() + " has {" +stringBuilder.toString()+"} neighbors");
+        }
     }
 }

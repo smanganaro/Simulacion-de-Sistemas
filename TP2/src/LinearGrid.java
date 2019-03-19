@@ -25,11 +25,11 @@ public class LinearGrid extends Grid {
             }
         }
     }
-    public boolean isValidIndex(int index, int m){
+    private boolean isValidIndex(int index, int m){
         return (index >= 0 && index < m);
     }
 
-    public boolean isValidPosition(int x, int y, int m){
+    private boolean isValidPosition(int x, int y, int m){
         return (isValidIndex(x,m) && isValidIndex(y,m));
     }
 }

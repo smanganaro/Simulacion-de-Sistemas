@@ -4,20 +4,20 @@ public class Particle {
     private Coordinates position;
     private Double radius;
     private Double color;
-    private Movement movement;
+    private Velocity velocity;
     private int ID;
 
 
-    public Particle(Coordinates position, double radius,double color, Coordinates velocity) {
+    public Particle(Coordinates position, double radius,double color, Velocity velocity) {
         this.position = position;
         this.radius = radius;
-        this.movement = new Movement(velocity);
+        this.velocity = velocity;
         this.ID=counter++;
         this.color = color;
     }
 
     public Particle(Coordinates position, double radius, double color) {
-        this(position,radius,color, new Coordinates(0,0));
+        this(position,radius,color, new Velocity(0,0));
     }
 
     public Coordinates getPosition() {
@@ -28,10 +28,6 @@ public class Particle {
         return radius;
     }
 
-    public Movement getMovement(){
-        return movement;
-    }
-
     public int getID(){
         return this.ID;
     }
@@ -40,27 +36,35 @@ public class Particle {
         return color;
     }
 
-    public void addMovement(Double time){
-        movement.Move(time, position.getX(), position.getY());
-    }
-
-    public void setPosition(Coordinates position) {
-        this.position = position;
+    public Velocity getVelocity() {
+        return velocity;
     }
 
     public void setRadius(Double radius) {
         this.radius = radius;
     }
 
-    public String toString(){
-        return "Particle ID: " + ID;
-    }
-    
-
     public Double getDistance(Particle particle){
        return Math.sqrt(Math.pow(this.getPosition().getX()-particle.getPosition().getX(), 2) +
                Math.pow(this.getPosition().getY()-particle.getPosition().getY(), 2));
    }
+
+    public void updatePos(double time){
+        double x = position.getX()+velocity.getX()*time;
+        double y = position.getY()+velocity.getY()*time;
+        this.position.setX(x);
+        this.position.setY(y);
+    }
+
+    public void setPosition(double x, double y){
+        this.position.setX(x);
+        this.position.setY(y);
+    }
+
+    public void setAngle(double ang){
+        this.velocity.setAngle(ang);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this)
