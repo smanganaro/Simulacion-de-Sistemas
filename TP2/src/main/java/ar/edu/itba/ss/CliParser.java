@@ -37,7 +37,7 @@ public class CliParser {
                 System.out.println("You must specify a dynamic file!");
                 System.exit(1);
             }
-
+            
             dynamicFile = cmd.getOptionValue("df");
 
             if (cmd.hasOption("n")) {
@@ -63,7 +63,6 @@ public class CliParser {
             if (cmd.hasOption("i")) {
                 intervals = Double.parseDouble(cmd.getOptionValue("t"));
             }
-
 
         }catch (Exception e){
             System.out.println("Command not recognized.");
