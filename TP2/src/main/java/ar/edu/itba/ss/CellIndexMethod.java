@@ -1,3 +1,4 @@
+package ar.edu.itba.ss;
 import java.util.*;
 
 public class CellIndexMethod {
@@ -25,6 +26,7 @@ public class CellIndexMethod {
 
     public Map<Particle, List<Particle>> getParticlesMapped() {
         Integer M = grid.getM();
+        Double L = grid.getL();
         Map<Particle, List<Particle>> particlesMapped = new HashMap<>();
 
         for(int i=0; i<M; i++){
@@ -33,7 +35,7 @@ public class CellIndexMethod {
                     //Particulas en mi celda
                     for (Particle q: grid.getCell(i,j).getParticles()) {
                         if (!p.equals(q)) {
-                            if (calculateDistance(p, q) <= Rc) {
+                            if (calculateDistance(p, q, L) <= Rc) {
                                 addToMap(p, q, particlesMapped);
                             }
                         }
@@ -41,7 +43,7 @@ public class CellIndexMethod {
                     //Particulas en celdas adyacentes
                     for(Cell neighbour : grid.getCell(i,j).getNeighbours()){
                         for(Particle q : neighbour.getParticles()){
-                            if(calculateDistance(p,q)<=Rc){
+                            if(calculateDistance(p,q,L)<=Rc){
                                 //Agrego ambas para aprovecharme de la simetria
                                 addToMap(p,q,particlesMapped);
                                 addToMap(q,p,particlesMapped);
@@ -64,9 +66,15 @@ public class CellIndexMethod {
 
     }
 
-    private double calculateDistance(Particle p, Particle q) {
-        return Math.sqrt(Math.pow(p.getPosition().getX()-q.getPosition().getX(), 2) +
-                Math.pow(p.getPosition().getY()-q.getPosition().getY(), 2))-p.getRadius()-q.getRadius();
+    private double calculateDistance(Particle p, Particle q, Double L) {
+        double dist = p.getDistance(q);
+        if(grid instanceof CicleGrid)
+            dist = p.getPeriodicDistance(q,L);
+
+        //Hasta ahora tenemos la distancia entre centros de masa,
+        //con esta resta podemos saber si las particulas estan dentro de Rc
+        dist = dist-p.getRadius()-q.getRadius();
+        return dist;
     }
 
     public void updatePosition(Particle p, Double interval){

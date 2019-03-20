@@ -1,3 +1,4 @@
+package ar.edu.itba.ss;
 public class Particle {
 
     private static int counter = 1;
@@ -49,6 +50,18 @@ public class Particle {
                Math.pow(this.getPosition().getY()-particle.getPosition().getY(), 2));
    }
 
+    public double getPeriodicDistance(Particle particle, double L){
+        double dx = Math.abs(this.getPosition().getX() - particle.getPosition().getX());
+        if (dx > L / 2)
+            dx = L - dx;
+
+        double dy = Math.abs(this.getPosition().getY() - particle.getPosition().getY());
+        if (dy > L / 2)
+            dy = L - dy;
+
+        return Math.sqrt(Math.pow(dx,2) + Math.pow(dy,2));
+    }
+
     public void updatePos(double time){
         double x = position.getX()+velocity.getX()*time;
         double y = position.getY()+velocity.getY()*time;
@@ -74,14 +87,11 @@ public class Particle {
 
         Particle other = (Particle) obj;
 
-        return (getPosition().equals(other.getPosition()) && getRadius().equals(other.getRadius()));
+        return (getID() == other.getID()) || (getPosition().equals(other.getPosition()) && getRadius().equals(other.getRadius()));
     }
+
     @Override
     public int hashCode() {
-        int hash = 17;
-        hash = hash * 23 + position.hashCode();
-        hash = hash * 23 + radius.hashCode();
-        //hash = hash * 23 + color.hashCode();
-        return hash;
+       return Integer.hashCode(getID());
     }
 }

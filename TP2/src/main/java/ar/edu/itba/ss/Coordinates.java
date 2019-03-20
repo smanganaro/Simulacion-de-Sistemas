@@ -1,3 +1,4 @@
+package ar.edu.itba.ss;
 public class Coordinates {
 
     private Double x;

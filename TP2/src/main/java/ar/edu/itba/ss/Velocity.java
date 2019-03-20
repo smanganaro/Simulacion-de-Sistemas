@@ -1,4 +1,4 @@
-
+package ar.edu.itba.ss;
 public class Velocity {
 
     private Double speed;

@@ -1,3 +1,4 @@
+package ar.edu.itba.ss;
 import java.util.List;
 
 public class LinearGrid extends Grid {
