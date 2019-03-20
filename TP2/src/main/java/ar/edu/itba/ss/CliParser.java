@@ -3,7 +3,7 @@ import org.apache.commons.cli.*;
 public class CliParser {
 
     public static String dynamicFile;
-    static double particleRadius;
+    static double particleRadius = 1;
     static double interactionRadius = 1;
     static double noise = 0.1;
     static double speed = 0.3;
@@ -12,7 +12,7 @@ public class CliParser {
     private static Options createOptions(){
         Options options = new Options();
         options.addOption("h", "help", false, "Shows this screen.");
-        options.addOption("rc", "radius", true, "Radius of interaction between particles.");
+        options.addOption("rc", "radius_interaction", true, "Radius of interaction between particles.");
         options.addOption("df", "dynamic_file", true, "Path to the file with the dynamic values.");
         options.addOption("rp", "radius_particles", true, "Radius of the particles");
         options.addOption("n", "noise", true, "Noise of the environment.");
@@ -31,31 +31,12 @@ public class CliParser {
                 help(options);
             }
 
-
             if (!cmd.hasOption("df")){
                 System.out.println("You must specify a dynamic file!");
                 System.exit(1);
             }
-
-            if (!cmd.hasOption("rp")){
-                System.out.println("You must specify a particle radius!");
-                System.exit(1);
-            }
-
-            if (!cmd.hasOption("t")){
-                System.out.println("You must specify a total time of simulation!");
-                System.exit(1);
-            }
-            if (!cmd.hasOption("rc")){
-                System.out.println("You must specify a radius of interaction!");
-                System.exit(1);
-            }
-
+         
             dynamicFile = cmd.getOptionValue("df");
-            particleRadius = Double.parseDouble(cmd.getOptionValue("rp"));
-            time = Integer.parseInt(cmd.getOptionValue("t"));
-            interactionRadius = Double.parseDouble(cmd.getOptionValue("rc"));
-
 
             if (cmd.hasOption("n")) {
                 noise = Double.parseDouble(cmd.getOptionValue("n"));
@@ -63,6 +44,18 @@ public class CliParser {
 
             if (cmd.hasOption("s")) {
                 speed = Double.parseDouble(cmd.getOptionValue("s"));
+            }
+
+            if (cmd.hasOption("rc")) {
+                interactionRadius = Double.parseDouble(cmd.getOptionValue("rc"));
+            }
+
+            if (cmd.hasOption("rp")) {
+                particleRadius = Double.parseDouble(cmd.getOptionValue("rp"));
+            }
+
+            if (cmd.hasOption("t")) {
+                time = Double.parseDouble(cmd.getOptionValue("t"));
             }
 
 
