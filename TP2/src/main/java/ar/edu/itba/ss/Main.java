@@ -14,7 +14,7 @@ public class Main {
 
             OffLatice offLatice = new OffLatice(grid,CliParser.interactionRadius,particlesInput.getParticles(),CliParser.time,DEFAULT_INTERVALS,CliParser.noise);
             offLatice.run();
-            
+
         }catch(Exception e){
             e.printStackTrace();
             System.out.println("There was an error while executing the program, please try again");
