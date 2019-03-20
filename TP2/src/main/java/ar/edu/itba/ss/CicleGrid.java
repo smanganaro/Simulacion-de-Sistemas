@@ -10,8 +10,8 @@ public class CicleGrid extends Grid {
 
     @Override
     public void calculateNeighbours() {
-        int[][] np = {{-1,0},{-1,1},{0,1},{1,1}};
-
+        //VER ESTO int[][] np = {{-1,0},{-1,1},{0,1},{1,1}};
+        int[][] np = {{0,+1},{+1,+1},{+1,0},{+1,-1}};
         for(int i=0; i<getM(); i++){
             for(int j=0; j<getM(); j++){
                 for(int n = 0; n < np.length;n++){
@@ -33,10 +33,6 @@ public class CicleGrid extends Grid {
 
         if(validX == true && validY == true)
             return new CellIndex(x,y);
-
-        //Elimino diagonales (LAS DIAGONALES VAN)
-        //if(validX == false && validY == false)
-        //    return null;
 
         return new CellIndex(x%m, y%m);
     }

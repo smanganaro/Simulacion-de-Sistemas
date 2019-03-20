@@ -1,8 +1,6 @@
 package ar.edu.itba.ss;
 import java.io.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class Output {
 
@@ -14,23 +12,33 @@ public class Output {
         return instance;
     }
 
-    public void write(List<Particle> particles, double time){
+    public void write(List<Particle> particles, double time) throws IOException {
         if(time == 0){
-            try{
-                PrintWriter pw = new PrintWriter("output.txt");
-                pw.close();
-            }catch (Exception e){
-                e.printStackTrace();
-            }
+            PrintWriter pw = new PrintWriter("output.txt");
+            pw.close();
         }
-        try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("output.txt", true)))) {
-            out.write(String.valueOf(time) + "\n");
-            for(Particle p: particles){
-                out.write(p.getID() + " " +  p.getPosition().getX() + " " + p.getPosition().getY() + " " + p.getVelocity().getAngle() + "\n");
-            }
-        }catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
+        PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("output.txt", true)));
+        out.write(generateFileString(particles)); //FALTARIA PASARLE A OVITO EL TIEMPO en generateFileString
+
+    }
+    public static String generateFileString(List<Particle> particles){
+        StringBuilder builder = new StringBuilder()
+                .append(particles.size())
+                .append("\r\n")
+                .append("//ID\t X\t Y\t Radius\t R\t G\t B\t\r\n");
+        for(Particle current: particles){
+            builder.append(current.getID())
+                    .append(" ")
+                    .append(current.getPosition().getX())
+                    .append(" ")
+                    .append(current.getPosition().getY())
+                    .append(" ")
+                    .append(current.getRadius())
+                    .append(" ")
+                    .append("1 0 0\r\n");
+
+        }
+        return builder.toString();
+    }
 }

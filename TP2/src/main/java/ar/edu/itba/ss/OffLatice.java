@@ -1,4 +1,5 @@
 package ar.edu.itba.ss;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -19,16 +20,24 @@ public class OffLatice {
         this.noiseAmp = noiseAmp;
     }
 
-    public double run(){
+    public double run() throws IOException {
         double time = 0;
-        while(time<=totalTime){
+        printParticles(0);
+        for(int i = 1;time<=totalTime;i++){
             simulate();
-            Output.getInstance().write(particles,time);
+            //Output.getInstance().write(particles,time);
+            printParticles(i);
             time += intervals;
         }
         return calculateVa();
     }
-
+    private void printParticles(int i){
+        System.out.println(particles.size());
+        System.out.println(i);
+        for (Particle p: particles){
+            System.out.println(p.getPosition().getX() + "\t" + p.getPosition().getY() + "\t" + p.getVelocity().getAngle());
+        }
+    }
     private void simulate(){
         Map<Particle, List<Particle>> mappedParticles = cellIndexMethod.getParticlesMapped();
         updateParticles(mappedParticles);
