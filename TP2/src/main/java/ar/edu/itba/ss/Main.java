@@ -3,7 +3,7 @@ package ar.edu.itba.ss;
 import static java.lang.System.exit;
 
 public class Main {
-    private static final double DEFAULT_INTERVALS = 1;
+
     public static void main( String[] args ) {
 
         CliParser.parseOptions(args);
@@ -12,7 +12,7 @@ public class Main {
             int M = getM(particlesInput.getL(),CliParser.interactionRadius);
             Grid grid = new CicleGrid(particlesInput.getL(), M, particlesInput.getParticles());
 
-            OffLatice offLatice = new OffLatice(grid,CliParser.interactionRadius,particlesInput.getParticles(),CliParser.time,DEFAULT_INTERVALS,CliParser.noise);
+            OffLatice offLatice = new OffLatice(grid,CliParser.interactionRadius,particlesInput.getParticles(),CliParser.time,CliParser.intervals,CliParser.noise);
             offLatice.run();
 
         }catch(Exception e){
