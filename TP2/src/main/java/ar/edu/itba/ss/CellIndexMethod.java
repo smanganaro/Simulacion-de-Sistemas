@@ -79,9 +79,11 @@ public class CellIndexMethod {
 
     public void updatePosition(Particle p, Double interval){
         double cellLength = grid.getL()/grid.getM();
+
         double prevX = p.getPosition().getX();
         double prevY = p.getPosition().getY();
         p.updatePos(interval);
+
         double newX = p.getPosition().getX();
         double newY = p.getPosition().getY();
 
@@ -93,20 +95,20 @@ public class CellIndexMethod {
         if(newCellX != cellX ||newCellY != cellY){
             grid.getCell(cellX, cellY).getParticles().remove(p);
 
-            if(isValidCellIndex(cellX, grid.getM())){
-                newX = (newX % grid.getL());
+            if(newCellX < 0){
+                newX = p.getPosition().getX() + grid.getL();
+            }else if(newCellX >= grid.getM()){
+                newX = p.getPosition().getX() - grid.getL();
             }
-            if(isValidCellIndex(cellY, grid.getM())){
-                newY = (newY % grid.getL());
+            if(newCellY < 0){
+                newY = p.getPosition().getY() + grid.getL();
+            }else if(newCellY >= grid.getM()){
+                newY = p.getPosition().getY() - grid.getL();
             }
 
             p.setPosition(newX, newY);
             grid.insertParticle(p);
         }
-    }
-
-    private boolean isValidCellIndex(int index, int m){
-        return (index >= 0 && index < m);
     }
 
     private void printParticlesNeighborsCount(Map<Particle, List<Particle>> particlesMapped){

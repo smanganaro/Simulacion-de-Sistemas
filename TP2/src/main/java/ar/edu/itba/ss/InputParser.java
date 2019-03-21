@@ -32,6 +32,7 @@ public class InputParser {
 
         return new ParticlesInput(length,parts);
     }
+
     public static class ParticlesInput{
         private Double L;
         private List<Particle> particles;

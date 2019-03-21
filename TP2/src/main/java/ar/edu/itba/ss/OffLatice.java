@@ -1,4 +1,6 @@
 package ar.edu.itba.ss;
+import net.jafama.FastMath;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -52,12 +54,12 @@ public class OffLatice {
     }
 
     private double getAverageAngle(Particle p, Map<Particle, List<Particle>> mappedParticles){
-        double totalSin = Math.sin(p.getVelocity().getAngle());
-        double totalCos = Math.cos(p.getVelocity().getAngle());
+        double totalSin = FastMath.sin(p.getVelocity().getAngle());
+        double totalCos = FastMath.cos(p.getVelocity().getAngle());
         if(mappedParticles.containsKey(p)){
             for(Particle n: mappedParticles.get(p)){
-                totalSin += Math.sin(n.getVelocity().getAngle());
-                totalCos += Math.cos(n.getVelocity().getAngle());
+                totalSin += FastMath.sin(n.getVelocity().getAngle());
+                totalCos += FastMath.cos(n.getVelocity().getAngle());
             }
             totalSin /= mappedParticles.get(p).size()+1;
             totalCos /= mappedParticles.get(p).size()+1;
@@ -72,6 +74,6 @@ public class OffLatice {
             xVel += p.getVelocity().getX();
             yVel += p.getVelocity().getY();
         }
-        return Math.sqrt(xVel*xVel+yVel*yVel)/particles.size();//ESTO ESTA BIEN EL SIZE???
+        return Math.sqrt(xVel*xVel+yVel*yVel)/particles.size();
     }
 }

@@ -7,18 +7,21 @@ import java.util.Set;
 public class Cell {
 
     private List<Particle> particles;
-    private List<Cell> neighbours;
+    private Set<Cell> neighbours;
+    private int ID;
+    private static int counter = 1;
 
     public Cell() {
         this.particles=new ArrayList<>();
-        this.neighbours=new ArrayList<>();
+        this.neighbours=new HashSet<>();
+        this.ID = counter++;
     }
 
     public List<Particle> getParticles() {
         return particles;
     }
 
-    public List<Cell> getNeighbours() {
+    public Set<Cell> getNeighbours() {
         return neighbours;
     }
 
@@ -28,5 +31,26 @@ public class Cell {
 
     public void addNeighbour (Cell cell){
         this.neighbours.add(cell);
+    }
+
+    public int getID() {
+        return ID;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (!(obj instanceof Cell))
+            return false;
+
+        Cell other = (Cell) obj;
+
+        return (getID() == other.getID());
+    }
+
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(ID);
     }
 }

@@ -18,6 +18,7 @@ public abstract class Grid {
             }
         }
         insertParticles(particles);
+        calculateNeighbours();
     }
 
     public abstract void calculateNeighbours();
@@ -43,9 +44,10 @@ public abstract class Grid {
             insertParticle(p);
         }
     }
+
     public void insertParticle(Particle p){
         int x = (int) (Math.floor(p.getPosition().getX()/(L/M)));
         int y = (int) (Math.floor(p.getPosition().getY()/(L/M)));
-        cells[x][y].getParticles().add(p);
+        cells[x][y].addParticle(p);
     }
 }
