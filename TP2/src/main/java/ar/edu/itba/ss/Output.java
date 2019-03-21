@@ -5,6 +5,7 @@ import java.util.List;
 public class Output {
 
     private static Output instance = null;
+    private static final int MAX_COLOR = 255;
 
     public static Output getInstance(){
         if(instance == null)
@@ -19,9 +20,10 @@ public class Output {
         }
 
         PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("output.txt", true)));
-        out.write(generateFileString(particles)); //FALTARIA PASARLE A OVITO EL TIEMPO en generateFileString
-
+        out.write(generateFileString(particles));
+        out.close();
     }
+
     public static String generateFileString(List<Particle> particles){
         StringBuilder builder = new StringBuilder()
                 .append(particles.size())
@@ -36,9 +38,25 @@ public class Output {
                     .append(" ")
                     .append(current.getRadius())
                     .append(" ")
-                    .append("1 0 0\r\n");
+                    .append(getParticleColour(current))
+                    .append("\r\n");
 
         }
         return builder.toString();
     }
+
+    private static String getParticleColour(Particle p){
+        StringBuilder builder = new StringBuilder();
+        double angle = p.getVelocity().getAngle() + Math.PI; //0 - 2PI
+        int colour = (int) (MAX_COLOR*angle/(2*Math.PI));
+
+        builder.append(colour)//R TODO ARREGLAR ESTO
+                .append(" ")
+                .append(MAX_COLOR)//G
+                .append(" ")
+                .append(MAX_COLOR);//B
+
+        return builder.toString();
+    }
+
 }

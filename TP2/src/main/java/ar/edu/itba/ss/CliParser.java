@@ -3,7 +3,7 @@ import org.apache.commons.cli.*;
 public class CliParser {
 
     public static String dynamicFile;
-    static double particleRadius = 1;
+    static double particleRadius = 0.2;
     static double interactionRadius = 1;
     static double noise = 0.1;
     static double speed = 0.3;

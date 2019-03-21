@@ -34,11 +34,11 @@ public class OffLatice {
         return calculateVa();
     }
     private void printParticles(int i){
-        System.out.println(particles.size());
+       /* System.out.println(particles.size());
         System.out.println(i);
         for (Particle p: particles){
             System.out.println(p.getPosition().getX() + "\t" + p.getPosition().getY() + "\t" + p.getVelocity().getAngle());
-        }
+        }*/
     }
     private void simulate(){
         Map<Particle, List<Particle>> mappedParticles = cellIndexMethod.getParticlesMapped();
@@ -48,9 +48,20 @@ public class OffLatice {
     private void updateParticles(Map<Particle, List<Particle>> mappedParticles){
         for(Particle p: particles){
             cellIndexMethod.updatePosition(p,intervals);
-            double avAngle = getAverageAngle(p, mappedParticles);
-            p.setAngle(avAngle + (Math.random()-0.5)*noiseAmp);
+            double newAngle = newAngle(p,mappedParticles,noiseAmp);
+            p.setAngle(newAngle);
         }
+    }
+
+    private double newAngle(Particle p, Map<Particle,List<Particle>> mappedParticles, double noise){
+        double avAngle = getAverageAngle(p, mappedParticles);
+        double angle = avAngle + (Math.random()-0.5)*noise;
+        if (angle > Math.PI){
+            angle -= 2*Math.PI;
+        }else if (angle < -Math.PI){
+            angle += 2*Math.PI;
+        }
+        return angle;
     }
 
     private double getAverageAngle(Particle p, Map<Particle, List<Particle>> mappedParticles){

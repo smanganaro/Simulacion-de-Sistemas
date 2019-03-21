@@ -30,7 +30,8 @@ public class Cell {
     }
 
     public void addNeighbour (Cell cell){
-        this.neighbours.add(cell);
+        if(!this.equals(cell))
+            this.neighbours.add(cell);
     }
 
     public int getID() {

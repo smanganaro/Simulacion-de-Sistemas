@@ -1,4 +1,7 @@
 package ar.edu.itba.ss;
+
+import net.jafama.FastMath;
+
 public class Velocity {
 
     private Double speed;
@@ -26,10 +29,10 @@ public class Velocity {
     }
 
     public double getX(){
-        return speed* Math.cos(angle);
+        return speed* FastMath.cos(angle);
     }
 
     public double getY(){
-        return speed* Math.sin(angle);
+        return speed* FastMath.sin(angle);
     }
 }

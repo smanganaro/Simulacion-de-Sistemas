@@ -1,5 +1,8 @@
 package ar.edu.itba.ss;
 
+import java.time.Duration;
+import java.time.Instant;
+
 import static java.lang.System.exit;
 
 public class Main {
@@ -8,13 +11,16 @@ public class Main {
 
         CliParser.parseOptions(args);
         try{
-            InputParser.ParticlesInput particlesInput = InputParser.readParticles(CliParser.dynamicFile,CliParser.speed,CliParser.interactionRadius);
+            InputParser.ParticlesInput particlesInput = InputParser.readParticles(CliParser.dynamicFile,CliParser.speed,CliParser.particleRadius);
             int M = getM(particlesInput.getL(),CliParser.interactionRadius);
             Grid grid = new CicleGrid(particlesInput.getL(), M, particlesInput.getParticles());
-
+            Instant start = Instant.now();
             OffLatice offLatice = new OffLatice(grid,CliParser.interactionRadius,particlesInput.getParticles(),CliParser.time,CliParser.intervals,CliParser.noise);
-            offLatice.run();
-
+            double Va = offLatice.run();
+            Instant finish = Instant.now();
+            long timeElapsed = Duration.between(start, finish).toMillis();
+            System.out.println("Simulation Va: "+Va);
+            System.out.println("Time elapsed: "+timeElapsed);
         }catch(Exception e){
             e.printStackTrace();
             System.out.println("There was an error while executing the program, please try again");

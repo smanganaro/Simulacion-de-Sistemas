@@ -21,7 +21,7 @@ public class CicleGrid extends Grid {
                 }
             }
         }
-        printNeighbors();
+        //printNeighbors();
     }
 
     private boolean isValidIndex(int index, int m){
