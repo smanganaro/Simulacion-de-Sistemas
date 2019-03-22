@@ -3,12 +3,13 @@ import org.apache.commons.cli.*;
 public class CliParser {
 
     public static String dynamicFile;
-    static double particleRadius = 0.2;
+    static double particleRadius = 0.05;
     static double interactionRadius = 1;
     static double noise = 0.1;
     static double speed = 0.3;
-    static double time = 100;
+    static double time = 500;
     static double intervals = 1;
+    static String filename = "DEFAULT_FILE_NAME";
 
     private static Options createOptions(){
         Options options = new Options();

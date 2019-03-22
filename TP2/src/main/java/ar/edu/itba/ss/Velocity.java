@@ -29,10 +29,10 @@ public class Velocity {
     }
 
     public double getX(){
-        return speed* FastMath.cos(angle);
+        return speed* Math.cos(angle);
     }
 
     public double getY(){
-        return speed* FastMath.sin(angle);
+        return speed* Math.sin(angle);
     }
 }

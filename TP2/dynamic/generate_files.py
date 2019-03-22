@@ -14,9 +14,9 @@ def generate_dynamic_file(number, length, name):
         )
 
 def generate_files(index, number, length):
-    generate_dynamic_file(number, length, str(index) + '-dynamic-' + str(number) + '.ari')
+    generate_dynamic_file(number, length, str(index) + '-dynamic-L-' +str(length) + '-N-' + str(number) + '.ari')
 
-numbers = [50,100,200,300,400,500,600,700,800,900,1000,2000,3000]
+numbers = [50,100,200,300,400,500,700,1000,3000]
 
 if (len(sys.argv) == 0):
     length = 20

@@ -14,6 +14,8 @@ public class InputParser {
         Scanner read = new Scanner(dFile);
         Double length = read.nextDouble();
 
+        CliParser.filename = dFile.getName();
+
         velocity = (velocity == null)? DEFAULT_VELOCITY : velocity;
         List<Particle> parts = new LinkedList<>();
 

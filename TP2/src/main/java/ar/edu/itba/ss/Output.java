@@ -1,25 +1,28 @@
 package ar.edu.itba.ss;
+import javax.sound.sampled.Clip;
 import java.io.*;
 import java.util.List;
 
 public class Output {
 
     private static Output instance = null;
-    private static final double MAX_COLOR = 1;
+    private static String filename = CliParser.filename;
 
     public static Output getInstance(){
-        if(instance == null)
+        if(instance == null) {
             instance = new Output();
+            filename = CliParser.filename+"_noise_"+CliParser.noise+"_output.txt";
+        }
         return instance;
     }
 
     public void write(List<Particle> particles, double time, double Va) throws IOException {
         if(time == 0){
-            PrintWriter pw = new PrintWriter("output.txt");
+            PrintWriter pw = new PrintWriter(filename);
             pw.close();
         }
 
-        PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("output.txt", true)));
+        PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(filename, true)));
         out.write(generateFileString(particles,time,Va));
         out.close();
     }
@@ -28,7 +31,7 @@ public class Output {
         StringBuilder builder = new StringBuilder()
                 .append(particles.size())
                 .append("\r\n")
-                .append("//ID\t X\t Y\t Radius\t R\t G\t B\t Time: ")
+                .append("//ID\t X\t Y\t Velocity X\t Velocity Y\t Radius\t Velocity Angle\t Time: ")
                 .append(time)
                 .append("\t Va: ")
                 .append(Va)
@@ -40,29 +43,17 @@ public class Output {
                     .append(" ")
                     .append(current.getPosition().getY())
                     .append(" ")
+                    .append(current.getVelocity().getX())
+                    .append(" ")
+                    .append(current.getVelocity().getY())
+                    .append(" ")
                     .append(current.getRadius())
                     .append(" ")
-                    .append(getParticleColour(current))
+                    .append(current.getVelocity().getAngle())
                     .append(" ")
-
                     .append("\r\n");
 
         }
         return builder.toString();
     }
-
-    private static String getParticleColour(Particle p){
-        StringBuilder builder = new StringBuilder();
-        double angle = p.getVelocity().getAngle() + Math.PI; //[0 - 2PI]
-        double colour =  (MAX_COLOR*angle/(2*Math.PI));//[0 - 1]
-
-        builder.append(colour)//R
-                .append(" ")
-                .append(0)//G
-                .append(" ")
-                .append(0);//B
-
-        return builder.toString();
-    }
-
 }

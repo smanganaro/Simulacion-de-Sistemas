@@ -24,11 +24,13 @@ public class OffLatice {
 
     public double run() throws IOException {
         double time = 0;
-        printParticles(0);
+        //printParticles(0);
         for(int i = 1;time<=totalTime;i++){
-            simulate();
+            if(time > 0)
+                simulate();
+
             Output.getInstance().write(particles,time,calculateVa());
-            printParticles(i);
+            //printParticles(i);
             time += intervals;
         }
         return calculateVa();
@@ -55,7 +57,7 @@ public class OffLatice {
 
     private double newAngle(Particle p, Map<Particle,List<Particle>> mappedParticles, double noise){
         double avAngle = getAverageAngle(p, mappedParticles);
-        double angle = avAngle + (Math.random()-0.5)*noise;
+        double angle = avAngle + noise * (Math.random() - (1.0 / 2.0));
         if (angle > Math.PI){
             angle -= 2*Math.PI;
         }else if (angle < -Math.PI){
@@ -75,7 +77,7 @@ public class OffLatice {
             totalSin /= mappedParticles.get(p).size()+1;
             totalCos /= mappedParticles.get(p).size()+1;
         }
-        return Math.atan2(totalSin,totalCos);
+        return FastMath.atan2(totalSin,totalCos);
     }
 
     private double calculateVa(){
@@ -85,6 +87,6 @@ public class OffLatice {
             xVel += p.getVelocity().getX();
             yVel += p.getVelocity().getY();
         }
-        return Math.sqrt(xVel*xVel+yVel*yVel)/particles.size();
+        return Math.sqrt(xVel*xVel+yVel*yVel)/(particles.size()*CliParser.speed);
     }
 }
