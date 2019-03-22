@@ -61,7 +61,7 @@ public class CliParser {
             }
 
             if (cmd.hasOption("i")) {
-                intervals = Double.parseDouble(cmd.getOptionValue("t"));
+                intervals = Double.parseDouble(cmd.getOptionValue("i"));
             }
 
         }catch (Exception e){

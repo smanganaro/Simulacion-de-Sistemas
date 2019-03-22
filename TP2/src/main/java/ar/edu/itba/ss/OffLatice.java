@@ -27,7 +27,7 @@ public class OffLatice {
         printParticles(0);
         for(int i = 1;time<=totalTime;i++){
             simulate();
-            Output.getInstance().write(particles,time);
+            Output.getInstance().write(particles,time,calculateVa());
             printParticles(i);
             time += intervals;
         }

@@ -95,20 +95,20 @@ public class CellIndexMethod {
         if(newCellX != cellX ||newCellY != cellY){
             grid.getCell(cellX, cellY).getParticles().remove(p);
 
-            if(newCellX < 0){
-                newX = p.getPosition().getX() + grid.getL();
-            }else if(newCellX >= grid.getM()){
-                newX = p.getPosition().getX() - grid.getL();
-            }
-            if(newCellY < 0){
-                newY = p.getPosition().getY() + grid.getL();
-            }else if(newCellY >= grid.getM()){
-                newY = p.getPosition().getY() - grid.getL();
-            }
-
+            newX = mod(newX, grid.getL());
+            newY = mod(newY, grid.getL());
             p.setPosition(newX, newY);
+
             grid.insertParticle(p);
         }
+    }
+
+    private double mod(double x, double n){
+        double r = x % n;
+        if (r < 0)
+            r += n;
+
+        return r;
     }
 
     private void printParticlesNeighborsCount(Map<Particle, List<Particle>> particlesMapped){
