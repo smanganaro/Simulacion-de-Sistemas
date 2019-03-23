@@ -23,23 +23,37 @@ public class OutputSimulation {
         if(time == 0){
             PrintWriter pw = new PrintWriter(filename);
             pw.close();
+            PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(filename, true)));
+            out.write(generateFileHeader(N,L,CliParser.noise));
+            out.close();
         }
 
         PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(filename, true)));
-        out.write(generateFileString(time,Va,N,L,CliParser.noise));
+        out.write(generateFileString(time,Va));
         out.close();
     }
 
-    public static String generateFileString(double time, double Va, double N, double L, double noise){
+    public static String generateFileHeader(double N, double L, double noise){
         double density = N/(L*L);
+        StringBuilder builder = new StringBuilder()
+                .append("N: ")
+                .append(N)
+                .append("\tL: ")
+                .append(L)
+                .append("\tDensity:")
+                .append(density)
+                .append("\tNoise: ")
+                .append(noise)
+                .append("\r\n")
+                .append("Time\t Va\t\r\n");
+        return builder.toString();
+    }
+
+    public static String generateFileString(double time, double Va){
         StringBuilder builder = new StringBuilder()
                 .append(time)
                 .append("\t")
                 .append(Va)
-                .append("\t")
-                .append(density)
-                .append("\t")
-                .append(noise)
                 .append("\r\n");
 
         return builder.toString();

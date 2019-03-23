@@ -29,19 +29,21 @@ public class OffLatice {
             if(time > 0)
                 simulate();
 
-            OutputParticle.getInstance().write(particles,time);
             OutputSimulation.getInstance().write(time,calculateVa(),particles.size(),cellIndexMethod.getGrid().getL());
+            if(CliParser.output_positions)
+                OutputParticle.getInstance().write(particles,time);
+
             //printParticles(i);
             time += intervals;
         }
         return calculateVa();
     }
     private void printParticles(int i){
-       /* System.out.println(particles.size());
+        System.out.println(particles.size());
         System.out.println(i);
         for (Particle p: particles){
             System.out.println(p.getPosition().getX() + "\t" + p.getPosition().getY() + "\t" + p.getVelocity().getAngle());
-        }*/
+        }
     }
     private void simulate(){
         Map<Particle, List<Particle>> mappedParticles = cellIndexMethod.getParticlesMapped();

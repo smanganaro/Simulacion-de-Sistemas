@@ -9,6 +9,7 @@ public class CliParser {
     static double speed = 0.3;
     static double time = 500;
     static double intervals = 1;
+    static boolean output_positions = true;
     static String filename = "DEFAULT_FILE_NAME";
 
     private static Options createOptions(){
@@ -21,6 +22,7 @@ public class CliParser {
         options.addOption("s", "speed", true, "Speed module of the particles.");
         options.addOption("t", "time", true, "Total time of the simulation.");
         options.addOption("i", "intervals", true, "Intervals of time.");
+        options.addOption("op", "output_animation", true, "If true, particles positions file will be generated");
         return options;
     }
 
@@ -63,6 +65,9 @@ public class CliParser {
 
             if (cmd.hasOption("i")) {
                 intervals = Double.parseDouble(cmd.getOptionValue("i"));
+            }
+            if (cmd.hasOption("op")) {
+                output_positions = Boolean.parseBoolean(cmd.getOptionValue("op"));
             }
 
         }catch (Exception e){
