@@ -1,9 +1,0 @@
-java -jar ../target/off-lattice-1.0-SNAPSHOT-jar-with-dependencies.jar -df ../dynamic/1-dynamic-L-25-N-50.ari -rc 1 -t 2000 -n 2 -op false
-java -jar ../target/off-lattice-1.0-SNAPSHOT-jar-with-dependencies.jar -df ../dynamic/2-dynamic-L-25-N-100.ari -rc 1 -t 2000 -n 2 -op false
-java -jar ../target/off-lattice-1.0-SNAPSHOT-jar-with-dependencies.jar -df ../dynamic/3-dynamic-L-25-N-200.ari -rc 1 -t 2000 -n 2 -op false
-java -jar ../target/off-lattice-1.0-SNAPSHOT-jar-with-dependencies.jar -df ../dynamic/4-dynamic-L-25-N-300.ari -rc 1 -t 2000 -n 2 -op false
-java -jar ../target/off-lattice-1.0-SNAPSHOT-jar-with-dependencies.jar -df ../dynamic/5-dynamic-L-25-N-400.ari -rc 1 -t 2000 -n 2 -op false
-java -jar ../target/off-lattice-1.0-SNAPSHOT-jar-with-dependencies.jar -df ../dynamic/6-dynamic-L-25-N-500.ari -rc 1 -t 2000 -n 2 -op false
-java -jar ../target/off-lattice-1.0-SNAPSHOT-jar-with-dependencies.jar -df ../dynamic/7-dynamic-L-25-N-700.ari -rc 1 -t 2000 -n 2 -op false
-java -jar ../target/off-lattice-1.0-SNAPSHOT-jar-with-dependencies.jar -df ../dynamic/8-dynamic-L-25-N-1000.ari -rc 1 -t 2000 -n 2 -op false
-java -jar ../target/off-lattice-1.0-SNAPSHOT-jar-with-dependencies.jar -df ../dynamic/9-dynamic-L-25-N-3000.ari -rc 1 -t 2000 -n 2 -op false
