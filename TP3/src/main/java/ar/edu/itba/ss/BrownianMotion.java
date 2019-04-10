@@ -8,15 +8,19 @@ public class BrownianMotion{
     private double L;
     private double time;
     private List<Particle> particles;
+    //private List<Coordinates> bigPmovement;
 
     public BrownianMotion(double l, double time,List<Particle> particles) {
         L = l;
         this.time = time;
         this.particles = particles;
+        //this.bigPmovement = new ArrayList<>();
+        //bigPmovement.add(particles.get(0).getPosition());
     }
 
     public void simulate() {
         int colNum = 0;
+        int counter = 0;
         for (double t = 0; t < time; ){
             double tc = Double.POSITIVE_INFINITY;
             Particle pi = null;
@@ -80,20 +84,36 @@ public class BrownianMotion{
                 }
             }
 
+            /*//Print big particle's entire movement
+            System.out.println(particles.get(0).getPosition().getX() + "\t" + particles.get(0).getPosition().getY());*/
+
             Particle.updatePositions(particles, tc);
+
+            //Save big particle's entire movement
+            //bigPmovement.add(particles.get(0).getPosition());
+
+            //Print big particle's first position per second
+            if(t>=counter){
+                System.out.println(particles.get(0).getPosition().getX() + "\t" + particles.get(0).getPosition().getY());
+                counter++;
+            }
+
+
 
             updateSpeed(pi, pj);
 
             t += tc;
 
-            System.out.println(particles.size() + 2);
+            /*System.out.println(particles.size() + 2);
             System.out.println(colNum++);
             for (Particle p : particles){
                 System.out.println(p.getPosition().getX() + "\t" + p.getPosition().getY() + "\t" + p.getVelocity().getX() + "\t" + p.getVelocity().getY() + "\t" + p.getRadius() + "\t" + tc);
             }
             // Print two particles for fixed Simulation Box in Ovito animation
             System.out.println(0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0.001 + "\t" + 0);
-            System.out.println(L + "\t" + L + "\t" + 0 + "\t" + 0 + "\t" + 0.001 + "\t" + 0);
+            System.out.println(L + "\t" + L + "\t" + 0 + "\t" + 0 + "\t" + 0.001 + "\t" + 0);*/
+
+
         }
     }
 
@@ -181,6 +201,10 @@ public class BrownianMotion{
             pj.getVelocity().setY(pj.getVelocity().getY() - Jy / pj.getMass());
         }
     }
+
+    /*public List<Coordinates> getBigPmovement (){
+        return bigPmovement;
+    }*/
 
     public double getL() {
         return L;
