@@ -52,22 +52,12 @@ public class ParticleGenerator {
             double vy;
 
             if (temperature == 0){
-                vx = randomSpeed();
-                vy = randomSpeed();
+                vx = randomSpeed(V1);
+                vy = randomSpeed(V1);
             }else{
                 double V = temperature/numberOfParticles;
-                vx = V/Math.sqrt(2);
-                vy = V/Math.sqrt(2);
-
-                double sign = Math.random();
-                if (sign > 0.5){
-                    vx = vx * (-1);
-                }
-                sign = Math.random();
-                if (sign > 0.5){
-                    vy = vy * (-1);
-                }
-
+                vx = randomSign(V/Math.sqrt(2));
+                vy = randomSign(V/Math.sqrt(2));
             }
             particles.add(new Particle(new Coordinates( x, y),R1,M1,new Velocity(vx,vy), particles));
         }
@@ -76,10 +66,22 @@ public class ParticleGenerator {
     }
 
     /**
+     * Obtain a random sign for a given velocity
+     * @return a velocity
+     */
+    private double randomSign(double v){
+        double sign = Math.random();
+        if (sign > 0.5){
+            return v * (-1);
+        }
+        return v;
+    }
+
+    /**
      * Obtain a random speed on a given interval
      * @return a speed on the interval (-V1, V1)
      */
-    private double randomSpeed(){
+    private double randomSpeed(double V1){
         return  2 * V1 * Math.random() - V1;
     }
 
