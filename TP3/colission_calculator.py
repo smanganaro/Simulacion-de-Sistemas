@@ -6,7 +6,7 @@ name, particles, time, q, filename = sys.argv
 q = int(q)
 
 with open(filename, 'w') as f:
-    csv_writer = csv.writer(f, delimiter=';',
+    csv_writer = csv.writer(f, delimiter=',',
                             quotechar='|', quoting=csv.QUOTE_MINIMAL)
     values = [None for x in range(0, q)]
     for i in range(0, len(values)):
