@@ -10,7 +10,6 @@ public class Particle {
     private Double radius;
     private Double mass;
     private Velocity velocity;
-    private Collision collision;
 
     public Particle(Coordinates position, double radius,double mass, Velocity velocity, List<Particle> particles) {
         if(!validCoordinates(position.getX(),position.getY(),radius,particles))
@@ -38,14 +37,6 @@ public class Particle {
 
     public Double getMass() {
         return mass;
-    }
-
-    public Collision getCollision() {
-        return collision;
-    }
-
-    public void setCollision(Collision collision) {
-        this.collision = collision;
     }
 
     public Velocity getVelocity() {
@@ -93,7 +84,7 @@ public class Particle {
     /**
      * Update system particles positions.
      * @param particles list of particles.
-     * @param tc time of the collision.
+     * @param tc time of the collisionType.
      */
     public static void updatePositions(List<Particle> particles, double tc) {
         for (Particle particle : particles){
@@ -111,8 +102,7 @@ public class Particle {
 
         Particle other = (Particle) obj;
 
-        return (getID() == other.getID()) || (getPosition().equals(other.getPosition())
-                && getMass() == other.getMass() && getRadius().equals(other.getRadius()));
+        return (getID() == other.getID());
     }
 
     @Override
