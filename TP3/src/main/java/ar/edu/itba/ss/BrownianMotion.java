@@ -1,20 +1,20 @@
 package ar.edu.itba.ss;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class BrownianMotion{
     private double L;
     private double time;
     private List<Particle> particles;
     private List<Coordinates> bigPmovement;
+    private Map<Integer, Map<Double,Integer>> mapVelocity;
 
     public BrownianMotion(double l, double time,List<Particle> particles) {
         L = l;
         this.time = time;
         this.particles = particles;
         this.bigPmovement = new ArrayList<>();
+        this.mapVelocity = new HashMap<>();
     }
 
     public void simulate() {
@@ -90,14 +90,51 @@ public class BrownianMotion{
             /*//Print big particle's entire movement
             //printBigParticleTrajectory();
             System.out.println(particles.get(0).getPosition().getX() + "\t" + particles.get(0).getPosition().getY());*/
+            if(t == 0){
+                Map<Double, Integer> map = new HashMap<>();
+                for(Particle p: particles){
+                    double velocidad = fijarNumero(p.getVelocity().getAbsoluteValue(),2);
+                    if(!map.containsKey(velocidad)){
+                        map.put(velocidad,0);
+                    }
+                    int q = map.get(velocidad);
+                    map.put(velocidad, q + 1);
+                }
+                mapVelocity.put(colNum, map);
+            }
 
             Particle.updatePositions(particles, tc);
             updateSpeed(pi, pj);
 
             t += tc;
 
-            printParticles(tc, colNum++);
+           // printParticles(tc, colNum++);
         }
+        Map<Double, Integer> velocidadesProm = new TreeMap<>();
+        int count = 0;
+        for(Map.Entry<Integer, Map<Double,Integer>> entry: mapVelocity.entrySet()){
+            count++;
+            for(Map.Entry<Double,Integer> velocidades: entry.getValue().entrySet()){
+                double velocidad = velocidades.getKey();
+                if(!velocidadesProm.containsKey(velocidad)){
+                    velocidadesProm.put(velocidad,0);
+                }
+                int q = velocidadesProm.get(velocidad);
+                velocidadesProm.put(velocidad, q + velocidades.getValue());
+            }
+        }
+        for(Map.Entry<Double,Integer> mecanse: velocidadesProm.entrySet()){
+            int q = mecanse.getValue()/count;
+            System.out.println(mecanse.getKey() + "\t" + q);
+        }
+    }
+
+    public static double fijarNumero(double numero, int digitos) {
+        double resultado;
+        resultado = numero * Math.pow(10, digitos);
+        resultado = Math.round(resultado);
+        resultado = resultado/Math.pow(10, digitos);
+        return resultado;
     }
 
     /**
