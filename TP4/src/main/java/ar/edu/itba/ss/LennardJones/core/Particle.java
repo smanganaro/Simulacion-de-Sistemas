@@ -58,7 +58,6 @@ public class Particle {
         return mass;
     }
 
-
     public Coordinates getVelocity() {
         return velocity;
     }
@@ -68,15 +67,22 @@ public class Particle {
                 Math.pow(this.getPosition().getY()-particle.getPosition().getY(), 2));
     }
 
-    public void updatePos(double time){
-        double x = position.getX()+velocity.getX()*time;
-        double y = position.getY()+velocity.getY()*time;
-        this.setPosition(x,y);
+    public void setPosition(Coordinates c){
+        setPosition(c.getX(),c.getY());
     }
 
     public void setPosition(double x, double y){
         this.position.setX(x);
         this.position.setY(y);
+    }
+
+    public void setVelocity(Coordinates c){
+        setVelocity(c.getX(),c.getY());
+    }
+
+    public void setVelocity(double x, double y){
+        this.velocity.setX(x);
+        this.velocity.setY(y);
     }
 
     /**
@@ -99,18 +105,6 @@ public class Particle {
         }
 
         return true;
-    }
-
-    /**
-     * Update system particles positions.
-     * @param particles list of particles.
-     * @param tc time of the collision.
-     */
-    public static void updatePositions(List<Particle> particles, double tc) {
-        for (Particle particle : particles){
-            particle.updatePos(tc);
-        }
-
     }
 
     @Override

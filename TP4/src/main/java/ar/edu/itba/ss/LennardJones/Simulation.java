@@ -4,6 +4,7 @@ import ar.edu.itba.ss.LennardJones.core.CellIndexMethod;
 import ar.edu.itba.ss.LennardJones.core.Coordinates;
 import ar.edu.itba.ss.LennardJones.core.LinearGrid;
 import ar.edu.itba.ss.LennardJones.core.Particle;
+import ar.edu.itba.ss.LennardJones.core.criteria.Criteria;
 import ar.edu.itba.ss.LennardJones.core.movement.MovementFunction;
 
 import java.util.ArrayList;
@@ -43,14 +44,45 @@ public class Simulation {
         this.movementFunctions = movementFunctions;
     }
 
-    private List<Particle> nextParticles(Map<Particle, List<Particle>> neighbours) {
-        List<Particle> nextParticles = new ArrayList<>(neighbours.size());
+    public List<Particle> run(Criteria endCriteria) {
+        double time = 0;
+        int iteration = 0;
 
-        for (Map.Entry<Particle, List<Particle>> entry : neighbours.entrySet()) {
-            nextParticles.add(moveParticle(entry.getKey(), entry.getValue()));
+        while (!endCriteria.test(time, particles)) {
+            Map<Particle, List<Particle>> neighbours = cim.getParticlesMapped();
+            moveParticles(neighbours);
+
+            //print particles
+            printParticles(time);
+            time += dt;
+            iteration++;
         }
 
-        return nextParticles;
+        return new ArrayList<>(particles);
+    }
+
+    private void printParticles(double t){
+        System.out.println(particles.size() + 2);
+        for (Particle p : particles){
+            System.out.println(p.getPosition().getX() + "\t" + p.getPosition().getY() + "\t"
+                    + p.getVelocity().getX() + "\t" + p.getVelocity().getY() + "\t" + p.getRadius() + "\t" + t);
+        }
+        // Print two particles for fixed Simulation Box in Ovito animation
+        System.out.println(0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0.001 + "\t" + 0);
+        System.out.println(L + "\t" + L + "\t" + 0 + "\t" + 0 + "\t" + 0.001 + "\t" + 0);
+    }
+
+    private void moveParticles(Map<Particle, List<Particle>> neighbours) {
+        for (Map.Entry<Particle, List<Particle>> entry : neighbours.entrySet()) {
+            Particle new_particle = moveParticle(entry.getKey(), entry.getValue());
+            Particle old_particle = entry.getKey();
+            updateParticle(old_particle,new_particle);
+        }
+    }
+
+    private void updateParticle(Particle oldP, Particle newP){
+        cim.updatePosition(oldP,newP.getPosition());
+        oldP.setVelocity(newP.getVelocity());
     }
 
     private Particle moveParticle(Particle particle, List<Particle> neighbours) {

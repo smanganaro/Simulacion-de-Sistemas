@@ -77,12 +77,12 @@ public class CellIndexMethod {
         return dist;
     }
 
-    public void updatePosition(Particle p, Double interval){
+    public void updatePosition(Particle p, Coordinates c){
         double cellLength = grid.getL()/grid.getM();
 
         double prevX = p.getPosition().getX();
         double prevY = p.getPosition().getY();
-        p.updatePos(interval);
+        p.setPosition(c);
 
         double newX = p.getPosition().getX();
         double newY = p.getPosition().getY();
