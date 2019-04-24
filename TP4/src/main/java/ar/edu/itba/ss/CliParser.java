@@ -1,5 +1,6 @@
 package ar.edu.itba.ss;
 
+import ar.edu.itba.ss.LennardJones.LennardJones;
 import org.apache.commons.cli.*;
 
 import java.util.ArrayList;
@@ -56,8 +57,7 @@ public class CliParser {
                 }
 
                 Configuration config = new Configuration(tf, dt, fps);
-
-
+                LennardJones.runBeemanTime(1);
                 exit(0);
             }
 

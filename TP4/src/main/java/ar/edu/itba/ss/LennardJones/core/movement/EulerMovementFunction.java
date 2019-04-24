@@ -2,7 +2,6 @@ package ar.edu.itba.ss.LennardJones.core.movement;
 
 import ar.edu.itba.ss.LennardJones.core.Coordinates;
 import ar.edu.itba.ss.LennardJones.core.Particle;
-import com.sun.istack.internal.NotNull;
 
 import java.util.Collections;
 import java.util.List;
@@ -12,7 +11,7 @@ public class EulerMovementFunction implements MovementFunction {
 
     private final BiFunction<Particle, List<Particle>, Coordinates> forceFunction;
 
-    public EulerMovementFunction(@NotNull final BiFunction<Particle, List<Particle>, Coordinates> forceFunction) {
+    public EulerMovementFunction(final BiFunction<Particle, List<Particle>, Coordinates> forceFunction) {
         this.forceFunction = forceFunction;
     }
 

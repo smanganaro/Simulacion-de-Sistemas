@@ -28,9 +28,8 @@ public class Simulation {
     public Simulation(final List<Particle> particles, final double boxWidth,
                       final double boxHeight, final double middleGap, final double dt,
                       double rc, final Map<Particle, MovementFunction> movementFunctions) {
-        this.L = boxHeight > boxWidth ? boxHeight : boxWidth;
+        this.L = (boxHeight > boxWidth) ? boxHeight : boxWidth;
         double maxRadius = getMaxRadius(particles);
-        int M = (int) Math.floor(L / (rc + 2 * maxRadius));
 
         this.particles = particles;
         this.dt = dt;
@@ -39,8 +38,8 @@ public class Simulation {
         this.middleGap = middleGap;
         this.rc = rc;
 
-        this.linearGrid = new LinearGrid(L,M, particles);
-        this.cim = new CellIndexMethod(linearGrid,rc);
+        this.linearGrid = new LinearGrid(L,rc, maxRadius, particles);
+        this.cim = new CellIndexMethod(linearGrid, rc);
         this.movementFunctions = movementFunctions;
     }
 
@@ -63,13 +62,14 @@ public class Simulation {
 
     private void printParticles(double t){
         System.out.println(particles.size() + 2);
+        System.out.println(t);
         for (Particle p : particles){
             System.out.println(p.getPosition().getX() + "\t" + p.getPosition().getY() + "\t"
-                    + p.getVelocity().getX() + "\t" + p.getVelocity().getY() + "\t" + p.getRadius() + "\t" + t);
+                    + p.getVelocity().getX() + "\t" + p.getVelocity().getY() + "\t" + p.getRadius());
         }
         // Print two particles for fixed Simulation Box in Ovito animation
         System.out.println(0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0.001 + "\t" + 0);
-        System.out.println(L + "\t" + L + "\t" + 0 + "\t" + 0 + "\t" + 0.001 + "\t" + 0);
+        System.out.println(boxWidth + "\t" + boxHeight + "\t" + 0 + "\t" + 0 + "\t" + 0.001 + "\t" + 0);
     }
 
     private void moveParticles(Map<Particle, List<Particle>> neighbours) {

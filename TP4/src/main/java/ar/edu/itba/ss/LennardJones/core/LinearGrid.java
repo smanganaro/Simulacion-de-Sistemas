@@ -6,7 +6,9 @@ public class LinearGrid extends Grid {
     public LinearGrid(Double l, Integer m, List<Particle> particles) {
         super(l, m, particles);
     }
-
+    public LinearGrid(double l,double rc, double maxRadius, List<Particle> particles) {
+        super(l,(int) Math.floor(l / (rc + 2 * maxRadius)),particles);
+    }
     @Override
     public void calculateNeighbours() {
         int[][] np = {{-1,0},{-1,1},{0,1},{1,1}};

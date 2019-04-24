@@ -21,6 +21,10 @@ public abstract class Grid {
         calculateNeighbours();
     }
 
+    public Grid(double l,double rc, double maxRadius, List<Particle> particles) {
+        this(l,(int) Math.floor(l / (rc + 2 * maxRadius)),particles);
+    }
+
     public abstract void calculateNeighbours();
 
     public Double getL() {

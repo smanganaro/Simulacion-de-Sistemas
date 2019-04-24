@@ -2,7 +2,6 @@ package ar.edu.itba.ss.LennardJones.core.movement;
 
 import ar.edu.itba.ss.LennardJones.core.Coordinates;
 import ar.edu.itba.ss.LennardJones.core.Particle;
-import com.sun.istack.internal.NotNull;
 
 import java.util.Collections;
 import java.util.List;
@@ -13,8 +12,8 @@ public class BeemanMovementFunction implements MovementFunction {
     private final BiFunction<Particle, List<Particle>, Coordinates> forceFunction;
     private Coordinates previousAcceleration;
 
-    public BeemanMovementFunction(@NotNull final BiFunction<Particle, List<Particle>, Coordinates>forceFunction,
-                                  @NotNull final Coordinates previousAcceleration) {
+    public BeemanMovementFunction(final BiFunction<Particle, List<Particle>, Coordinates>forceFunction,
+                                  final Coordinates previousAcceleration) {
 
         this.forceFunction = forceFunction;
         this.previousAcceleration = previousAcceleration;
