@@ -1,196 +1,194 @@
 package ar.edu.itba.ss.LennardJones;
 
-import ar.edu.itba.ss.LennardJones.core.CellIndexMethod;
-import ar.edu.itba.ss.LennardJones.core.Coordinates;
-import ar.edu.itba.ss.LennardJones.core.LinearGrid;
+import ar.edu.itba.ss.LennardJones.movement.MovementFunction;
+import ar.edu.itba.ss.LennardJones.core.neigbour.CellIndexMethod;
+import ar.edu.itba.ss.LennardJones.core.Neighbour;
+import ar.edu.itba.ss.LennardJones.criteria.Criteria;
+import javafx.geometry.Point2D;
 import ar.edu.itba.ss.LennardJones.core.Particle;
-import ar.edu.itba.ss.LennardJones.core.criteria.Criteria;
-import ar.edu.itba.ss.LennardJones.core.movement.MovementFunction;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Simulation {
-    private final List<Particle> particles;
-    private final double dt;
-    private final double boxWidth;
-    private final double boxHeight;
-    private final double middleGap;
-    private final CellIndexMethod cim;
-    private final double rc;
-    private final double L;
-    private final LinearGrid linearGrid;
-    private final Map<Particle, MovementFunction> movementFunctions;
 
-    public Simulation(final List<Particle> particles, final double boxWidth,
-                      final double boxHeight, final double middleGap, final double dt,
-                      double rc, final Map<Particle, MovementFunction> movementFunctions) {
-        this.L = (boxHeight > boxWidth) ? boxHeight : boxWidth;
-        double maxRadius = getMaxRadius(particles);
+  private final List<Particle> initialParticles;
+  private final double dt;
+  private final int writerIteration;
+  private final double boxWidth;
+  private final double boxHeight;
+  private final double middleGap;
+  private final CellIndexMethod cim;
+  private final double rc;
+  private final Map<Particle, MovementFunction> movementFunctions;
 
-        this.particles = particles;
-        this.dt = dt;
-        this.boxWidth = boxWidth;
-        this.boxHeight = boxHeight;
-        this.middleGap = middleGap;
-        this.rc = rc;
+  public Simulation(final List<Particle> initialParticles, final double boxWidth,
+                    final double boxHeight, final double middleGap, final double dt, final int writerIteration,
+                    double rc,
+                    final Map<Particle, MovementFunction> movementFunctions) {
+    this.initialParticles = initialParticles;
+    this.dt = dt;
+    this.writerIteration = writerIteration;
+    this.boxWidth = boxWidth;
+    this.boxHeight = boxHeight;
+    this.middleGap = middleGap;
+    this.rc = rc;
+    this.cim = new CellIndexMethod(Math.max(boxHeight, boxWidth), false);
+    this.movementFunctions = movementFunctions;
+  }
 
-        this.linearGrid = new LinearGrid(L,rc, maxRadius, particles);
-        this.cim = new CellIndexMethod(linearGrid, rc);
-        this.movementFunctions = movementFunctions;
+  public Set<Particle> simulate(Criteria endCriteria) {
+    double time = 0;
+    int iteration = 1;
+    List<Particle> particles = initialParticles;
+
+    while (!endCriteria.test(time, particles)) {
+      Map<Particle, Set<Neighbour>> neighbours = cim
+          .apply(particles, particles.get(0).getRadius(), rc);
+      particles = nextParticles(neighbours);
+
+      if (iteration == writerIteration) {
+          iteration = 0;
+          printParticles(particles,time, iteration);
+      }
+
+      time += dt;
+      iteration++;
     }
 
-    public List<Particle> run(Criteria endCriteria) {
-        double time = 0;
-        int iteration = 0;
+    return new HashSet<>(particles);
+  }
 
-        while (!endCriteria.test(time, particles)) {
-            Map<Particle, List<Particle>> neighbours = cim.getParticlesMapped();
-            moveParticles(neighbours);
+  private void printParticles(List<Particle> particles, double t, int iteration){
+    System.out.println(particles.size() + 2);
+    System.out.println(t);
+    for (Particle p : particles){
+      System.out.println(p.getPosition().getX() + "\t" + p.getPosition().getY() + "\t"
+              + p.getVelocity().getX() + "\t" + p.getVelocity().getY() + "\t" + p.getRadius());
+    }
+    // Print two particles for fixed Simulation Box in Ovito animation
+    System.out.println(0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0.001 + "\t" + 0);
+    System.out.println(boxWidth + "\t" + boxHeight + "\t" + 0 + "\t" + 0 + "\t" + 0.001 + "\t" + 0);
+  }
 
-            //print particles
-            printParticles(time);
-            time += dt;
-            iteration++;
-        }
+  private List<Particle> nextParticles(Map<Particle, Set<Neighbour>> neighbours) {
+    List<Particle> nextParticles = new ArrayList<>(neighbours.size());
 
-        return new ArrayList<>(particles);
+    for (Map.Entry<Particle, Set<Neighbour>> entry : neighbours.entrySet()) {
+      nextParticles.add(moveParticle(entry.getKey(), entry.getValue()));
     }
 
-    private void printParticles(double t){
-        System.out.println(particles.size() + 2);
-        System.out.println(t);
-        for (Particle p : particles){
-            System.out.println(p.getPosition().getX() + "\t" + p.getPosition().getY() + "\t"
-                    + p.getVelocity().getX() + "\t" + p.getVelocity().getY() + "\t" + p.getRadius());
-        }
-        // Print two particles for fixed Simulation Box in Ovito animation
-        System.out.println(0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0.001 + "\t" + 0);
-        System.out.println(boxWidth + "\t" + boxHeight + "\t" + 0 + "\t" + 0 + "\t" + 0.001 + "\t" + 0);
+    return nextParticles;
+  }
+
+  private Particle moveParticle(Particle particle, Set<Neighbour> neighbours) {
+    neighbours = neighbours.stream()
+        .filter(n -> !isWallBetween(particle, n.getNeighbourParticle()))
+        .collect(Collectors.toSet());
+    addWallParticles(particle, neighbours);
+
+    MovementFunction function = movementFunctions.get(particle);
+    return function.move(particle, neighbours, dt);
+  }
+
+  private void addWallParticles(Particle particle, Set<Neighbour> neighbours) {
+    int wallId = -1;
+    final double gapStart = (boxHeight / 2) - (middleGap / 2);
+    final double gapEnd = boxHeight - gapStart;
+    // up wall
+    double distanceToExtremeWall = boxHeight - particle.getPosition().getY();
+    double distanceToMiddleWall = gapEnd - particle.getPosition().getY();
+    if (particle.getPosition().getX() == boxWidth / 2 && distanceToMiddleWall <= rc
+            && distanceToMiddleWall >= 0) {
+//      neighbours.add(new Neighbour(ImmutableParticle.builder()
+//          .id(wallId--).position(new Point2D(boxWidth / 2, gapEnd))
+//          .mass(Double.POSITIVE_INFINITY)
+//          .velocity(Point2D.ZERO).build(), distanceToMiddleWall));
+    } else if (distanceToExtremeWall <= rc) {
+      Point2D c = new Point2D(particle.getPosition().getX(), boxHeight);
+      neighbours.add(new Neighbour(new Particle(wallId--,c,0,Double.POSITIVE_INFINITY,Collections.emptyList()), distanceToExtremeWall));
     }
 
-    private void moveParticles(Map<Particle, List<Particle>> neighbours) {
-        for (Map.Entry<Particle, List<Particle>> entry : neighbours.entrySet()) {
-            Particle new_particle = moveParticle(entry.getKey(), entry.getValue());
-            Particle old_particle = entry.getKey();
-            updateParticle(old_particle,new_particle);
-        }
+    // down wall
+    distanceToExtremeWall = particle.getPosition().getY();
+    distanceToMiddleWall = particle.getPosition().getY() - gapStart;
+    if (particle.getPosition().getX() == boxWidth / 2 && distanceToMiddleWall <= rc
+            && distanceToMiddleWall >= 0) {
+//      neighbours.add(new Neighbour(ImmutableParticle.builder()
+//          .id(wallId--).position(new Point2D(boxWidth / 2, gapStart))
+//          .mass(Double.POSITIVE_INFINITY)
+//          .velocity(Point2D.ZERO).build(), distanceToMiddleWall));
+    } else if (distanceToExtremeWall <= rc) {
+      Point2D c = new Point2D(particle.getPosition().getX(), 0);
+      neighbours.add(new Neighbour(new Particle(wallId--,c,0,Double.POSITIVE_INFINITY,Collections.emptyList()), distanceToExtremeWall));
     }
 
-    private void updateParticle(Particle oldP, Particle newP){
-        cim.updatePosition(oldP,newP.getPosition());
-        oldP.setVelocity(newP.getVelocity());
+    // left wall
+    distanceToExtremeWall = particle.getPosition().getX();
+    distanceToMiddleWall = distanceToExtremeWall - boxWidth / 2;
+    if (distanceToMiddleWall > 0 && distanceToMiddleWall <= rc &&
+            (particle.getPosition().getY() <= gapStart || particle.getPosition().getY() >= gapEnd)
+//        && !(particle.velocity().getX() > 0 && particle.position().getY() > gapStart - 5
+//            && particle.position().getY() < gapEnd + 5)
+    ) {
+      Point2D c = new Point2D(boxWidth / 2, particle.getPosition().getY());
+      neighbours.add(new Neighbour(new Particle(wallId--,c,0,Double.POSITIVE_INFINITY,Collections.emptyList()), distanceToMiddleWall));
+    } else if (distanceToExtremeWall <= rc) {
+      Point2D c = new Point2D(0, particle.getPosition().getY());
+      neighbours.add(new Neighbour(new Particle(wallId--,c,0,Double.POSITIVE_INFINITY,Collections.emptyList()), distanceToExtremeWall));
     }
 
-    private Particle moveParticle(Particle particle, List<Particle> neighbours) {
-        List<Particle> neighbours_inside = neighbours.stream()
-                .filter(n -> !isWallBetween(particle, n))
-                .collect(Collectors.toList());
-
-        addWallParticles(particle, neighbours_inside);
-
-        MovementFunction function = movementFunctions.get(particle);
-        return function.move(particle, neighbours_inside, dt);
+    // right wall
+    distanceToExtremeWall = boxWidth - particle.getPosition().getX();
+    distanceToMiddleWall = distanceToExtremeWall - boxWidth / 2;
+    if (distanceToMiddleWall > 0 && distanceToMiddleWall <= rc &&
+            (particle.getPosition().getY() <= gapStart || particle.getPosition().getY() >= gapEnd)
+//        && !(particle.velocity().getX() < 0 && particle.position().getY() > gapStart - 0.005
+//            && particle.position().getY() < gapEnd + 0.005)
+    ) {
+      Point2D c = new Point2D(boxWidth / 2, particle.getPosition().getY());
+      neighbours.add(new Neighbour(new Particle(wallId--,c,0,Double.POSITIVE_INFINITY, Collections.emptyList()), distanceToMiddleWall));
+    } else if (distanceToExtremeWall <= rc) {
+      Point2D c = new Point2D(boxWidth, particle.getPosition().getY());
+      neighbours.add(new Neighbour(new Particle(wallId--,c,0,Double.POSITIVE_INFINITY,Collections.emptyList()), distanceToExtremeWall));
     }
 
-    private void addWallParticles(Particle particle, List<Particle> neighbours) {
-        int wallId = -1;
-        final double gapStart = (boxHeight / 2) - (middleGap / 2);
-        final double gapEnd = boxHeight - gapStart;
-        List<Particle> particles = Collections.emptyList();
-        // up wall
-        double distanceToExtremeWall = boxHeight - particle.getPosition().getY();
-        double distanceToMiddleWall = gapEnd - particle.getPosition().getY();
+    if (particle.getPosition().getY() > gapStart && particle.getPosition().getY() < gapEnd) {
+      final Point2D gapStartPosition = new Point2D(boxWidth / 2, gapStart);
+      final Point2D gapEndPosition = new Point2D(boxWidth / 2, gapEnd);
+      final double gapStartDistance = particle.getPosition().distance(gapStartPosition);
+      final double gapEndDistance = particle.getPosition().distance(gapEndPosition);
 
-        if (particle.getPosition().getX() == boxWidth / 2 && distanceToMiddleWall <= rc
-                && distanceToMiddleWall >= 0) {
-        } else if (distanceToExtremeWall <= rc) {
-            Coordinates coordinates = new Coordinates(particle.getPosition().getX(),boxHeight);
-            neighbours.add(new Particle(wallId--, coordinates,0,Double.POSITIVE_INFINITY,particles));
-        }
+      if (gapStartDistance <= rc) {
+        neighbours.add(new Neighbour(new Particle(wallId--,gapStartPosition,0,Double.POSITIVE_INFINITY,Collections.emptyList()), gapStartDistance));
+      }
 
-        // down wall
-        distanceToExtremeWall = particle.getPosition().getY();
-        distanceToMiddleWall = particle.getPosition().getY() - gapStart;
-        if (particle.getPosition().getX() == boxWidth / 2 && distanceToMiddleWall <= rc
-                && distanceToMiddleWall >= 0) {
-        } else if (distanceToExtremeWall <= rc) {
-            Coordinates coordinates = new Coordinates(particle.getPosition().getX(),0);
-            neighbours.add(new Particle(wallId--, coordinates,0,Double.POSITIVE_INFINITY,particles));
-        }
+      if (gapEndDistance <= rc) {
+        neighbours.add(new Neighbour(new Particle(wallId--,gapEndPosition,0,Double.POSITIVE_INFINITY,Collections.emptyList()), gapEndDistance));
+      }
+    }
+  }
 
-        // left wall
-        distanceToExtremeWall = particle.getPosition().getX();
-        distanceToMiddleWall = distanceToExtremeWall - boxWidth / 2;
-        if (distanceToMiddleWall > 0 && distanceToMiddleWall <= rc &&
-                (particle.getPosition().getY() <= gapStart || particle.getPosition().getY() >= gapEnd)) {
-            Coordinates coordinates = new Coordinates(boxWidth / 2, particle.getPosition().getY());
-            neighbours.add(new Particle(wallId--, coordinates,0,Double.POSITIVE_INFINITY,particles));
-        } else if (distanceToExtremeWall <= rc) {
-            Coordinates coordinates = new Coordinates(0, particle.getPosition().getY());
-            neighbours.add(new Particle(wallId--, coordinates,0,Double.POSITIVE_INFINITY,particles));
-        }
+  private boolean isWallBetween(Particle particle1, Particle particle2) {
+    final double x1 = particle1.getPosition().getX();
+    final double x2 = particle2.getPosition().getX();
+    final double y1 = particle1.getPosition().getY();
+    final double y2 = particle2.getPosition().getY();
 
-        // right wall
-        distanceToExtremeWall = boxWidth - particle.getPosition().getX();
-        distanceToMiddleWall = distanceToExtremeWall - boxWidth / 2;
-        if (distanceToMiddleWall > 0 && distanceToMiddleWall <= rc &&
-                (particle.getPosition().getY() <= gapStart || particle.getPosition().getY() >= gapEnd)) {
-            Coordinates coordinates = new Coordinates(boxWidth / 2, particle.getPosition().getY());
-            neighbours.add(new Particle(wallId--, coordinates,0,Double.POSITIVE_INFINITY,particles));
-        } else if (distanceToExtremeWall <= rc) {
-            Coordinates coordinates = new Coordinates(boxWidth, particle.getPosition().getY());
-            neighbours.add(new Particle(wallId--, coordinates,0,Double.POSITIVE_INFINITY,particles));
-        }
-
-        if (particle.getPosition().getY() > gapStart && particle.getPosition().getY() < gapEnd) {
-            final Coordinates gapStartPosition = new Coordinates(boxWidth / 2, gapStart);
-            final Coordinates gapEndPosition = new Coordinates(boxWidth / 2, gapEnd);
-            final double gapStartDistance = gapStartPosition.getDistance(particle.getPosition());
-            final double gapEndDistance = gapEndPosition.getDistance(particle.getPosition());
-
-            if (gapStartDistance <= rc) {
-                neighbours.add(new Particle(wallId--, gapStartPosition,0,Double.POSITIVE_INFINITY,particles));
-            }
-
-            if (gapEndDistance <= rc) {
-                neighbours.add(new Particle(wallId--, gapEndPosition,0,Double.POSITIVE_INFINITY,particles));
-            }
-        }
+    if (x1 == x2) {
+      return false;
     }
 
-    private boolean isWallBetween(Particle particle1, Particle particle2) {
-        final double x1 = particle1.getPosition().getX();
-        final double x2 = particle2.getPosition().getX();
-        final double y1 = particle1.getPosition().getY();
-        final double y2 = particle2.getPosition().getY();
+    final double m = (y2 - y1) / (x2 - x1);
+    final double b = y1 - m * x1;
+    final double xp = boxWidth / 2;
+    final double yp = m * xp + b;
 
-        if (x1 == x2) {
-            return false;
-        }
+    final double gapStart = (boxHeight / 2) - (middleGap / 2);
+    final double gapEnd = boxHeight - gapStart;
 
-        final double m = (y2 - y1) / (x2 - x1);
-        final double b = y1 - m * x1;
-        final double xp = boxWidth / 2;
-        final double yp = m * xp + b;
-
-        final double gapStart = (boxHeight / 2) - (middleGap / 2);
-        final double gapEnd = boxHeight - gapStart;
-
-        return yp > gapStart && yp < gapEnd &&
-                ((x1 > boxWidth / 2 && x2 < boxWidth / 2) ||
-                        (x1 < boxWidth / 2 && x2 > boxWidth / 2));
-    }
-
-    private double getMaxRadius(List<Particle> particles){
-        double max = 0;
-        for(Particle p : particles){
-            if(p.getRadius() > max)
-                max = p.getRadius();
-        }
-        return max;
-    }
+    return yp > gapStart && yp < gapEnd &&
+            ((x1 > boxWidth / 2 && x2 < boxWidth / 2) ||
+                    (x1 < boxWidth / 2 && x2 > boxWidth / 2));
+  }
 }

@@ -1,11 +1,13 @@
 package ar.edu.itba.ss.LennardJones.core;
 
+import javafx.geometry.Point2D;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class ParticleGenerator {
-    //Default values
+
 
     /* Small Particles */
     private double R1;
@@ -32,15 +34,15 @@ public class ParticleGenerator {
             double y;
 
             do {
-                x = randomCoordinates(width, R1);
-                y = randomCoordinates(height, R1);
+                x = randomPoint2D(width, R1);
+                y = randomPoint2D(height, R1);
             }
-            while (!Particle.validCoordinates(x, y, R1, particles));
+            while (!Particle.validPoint2D(x, y, R1, particles));
             double randomAngle = randomAngle();
             double vx = MAGNITUDE*Math.cos(randomAngle);
             double vy = MAGNITUDE*Math.sin(randomAngle);
-            Coordinates c = new Coordinates(x,y);
-            Coordinates v = new Coordinates(vx,vy);
+            Point2D c = new Point2D(x,y);
+            Point2D v = new Point2D(vx,vy);
             particles.add(new Particle(c,R1,M1,v, Collections.EMPTY_LIST));
         }
 
@@ -60,9 +62,7 @@ public class ParticleGenerator {
      * @param radius radius of the particle.
      * @return a coordinate in the (radius, L - radius) interval.
      */
-    private double randomCoordinates(double L, double radius){
+    private double randomPoint2D(double L, double radius){
         return  radius + (L - 2 * radius) * Math.random();
     }
-
-
 }

@@ -1,6 +1,6 @@
 package ar.edu.itba.ss;
 
-import ar.edu.itba.ss.LennardJones.LennardJones;
+import ar.edu.itba.ss.LennardJones.LennardWrapper;
 import org.apache.commons.cli.*;
 
 import java.util.ArrayList;
@@ -57,7 +57,7 @@ public class CliParser {
                 }
 
                 Configuration config = new Configuration(tf, dt, fps);
-                LennardJones.runBeemanTime(1);
+                LennardWrapper.runBeemanTime(20);
                 exit(0);
             }
 
@@ -74,7 +74,7 @@ public class CliParser {
             }
 
         }catch (Exception e){
-            System.err.println("Command not recognized.");
+            e.printStackTrace();
             help(options);
         }
 
