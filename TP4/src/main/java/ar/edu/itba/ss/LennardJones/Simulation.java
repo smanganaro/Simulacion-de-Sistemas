@@ -20,11 +20,12 @@ public class Simulation {
   private final double middleGap;
   private final double L;
   private final double rc;
+  private final Printer printer;
   private final Map<Particle, MovementFunction> movementFunctions;
 
   public Simulation(final List<Particle> initialParticles, final double boxWidth,
                     final double boxHeight, final double middleGap, final double dt, final int writerIteration,
-                    double rc,
+                    double rc, final Printer printer,
                     final Map<Particle, MovementFunction> movementFunctions) {
     this.initialParticles = initialParticles;
     this.dt = dt;
@@ -34,6 +35,7 @@ public class Simulation {
     this.middleGap = middleGap;
     this.rc = rc;
     this.L = Math.max(boxHeight, boxWidth);
+    this.printer = printer;
     this.movementFunctions = movementFunctions;
   }
 
@@ -45,30 +47,18 @@ public class Simulation {
     while (!endCriteria.test(time, particles)) {
       CellIndexMethod cellIndexMethod = new CellIndexMethod(particles,L, rc, particles.get(0).getRadius(), false);
       Map<Particle, Set<Neighbour>> neighbours = cellIndexMethod.getParticlesMapped();
-      particles = nextParticles(neighbours);
 
       if (iteration == writerIteration) {
           iteration = 0;
-          printParticles(particles,time, iteration);
+          printer.print(neighbours,time, iteration);
       }
+      particles = nextParticles(neighbours);
 
       time += dt;
       iteration++;
     }
 
     return new HashSet<>(particles);
-  }
-
-  private void printParticles(List<Particle> particles, double t, int iteration){
-    System.out.println(particles.size() + 2);
-    System.out.println(t);
-    for (Particle p : particles){
-      System.out.println(p.getPosition().getX() + "\t" + p.getPosition().getY() + "\t"
-              + p.getVelocity().getX() + "\t" + p.getVelocity().getY() + "\t" + p.getRadius());
-    }
-    // Print two particles for fixed Simulation Box in Ovito animation
-    System.out.println(0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0.001 + "\t" + 0);
-    System.out.println(boxWidth + "\t" + boxHeight + "\t" + 0 + "\t" + 0 + "\t" + 0.001 + "\t" + 0);
   }
 
   private List<Particle> nextParticles(Map<Particle, Set<Neighbour>> neighbours) {

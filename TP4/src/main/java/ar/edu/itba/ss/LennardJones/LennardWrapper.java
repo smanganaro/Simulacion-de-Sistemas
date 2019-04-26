@@ -52,9 +52,9 @@ public class LennardWrapper {
 
     beemanAddCurrentParticlesAndMovementFunctions(previousParticles, previousNeighbours,
         currentParticles, movementFunctions);
-
+    Printer printer = new CoordinatePrinter(BOX_WIDTH,BOX_HEIGHT);
     final Simulation simulator = new Simulation(currentParticles,
-        BOX_WIDTH, BOX_HEIGHT, BOX_GAP, DT, WRITER_ITERATION, RC, movementFunctions);
+        BOX_WIDTH, BOX_HEIGHT, BOX_GAP, DT, WRITER_ITERATION, RC,printer, movementFunctions);
 
     final Criteria criteria = new TimeCriteria(time);
 
