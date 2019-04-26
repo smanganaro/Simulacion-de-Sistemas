@@ -1,14 +1,14 @@
-package ar.edu.itba.ss.LennardJones.movement;
+package ar.edu.itba.ss.movement.forces;
 
 import static java.lang.Math.pow;
 
-import ar.edu.itba.ss.LennardJones.core.Neighbour;
-import javafx.geometry.Point2D;
-import ar.edu.itba.ss.LennardJones.core.Particle;
+import ar.edu.itba.ss.core.Neighbour;
+import ar.edu.itba.ss.core.Coordinates;
+import ar.edu.itba.ss.core.Particle;
 import java.util.Set;
 import java.util.function.BiFunction;
 
-public class LennardJonesForceFunction implements BiFunction<Particle, Set<Neighbour>, Point2D> {
+public class LennardJonesForceFunction implements BiFunction<Particle, Set<Neighbour>, Coordinates> {
 
   private final double epsilon;
   private final double rm;
@@ -19,19 +19,19 @@ public class LennardJonesForceFunction implements BiFunction<Particle, Set<Neigh
   }
 
   @Override
-  public Point2D apply(final Particle particle, final Set<Neighbour> neighbours) {
+  public Coordinates apply(final Particle particle, final Set<Neighbour> neighbours) {
 
     double totalForceX = 0;
     double totalForceY = 0;
 
     for (final Neighbour neighbour : neighbours) {
       final double magnitude = forceMagnitude(epsilon, rm, neighbour.getDistance());
-      final Point2D distanceVector = particle.getPosition().subtract(neighbour.getNeighbourParticle().getPosition());
+      final Coordinates distanceVector = particle.getPosition().subtract(neighbour.getNeighbourParticle().getPosition());
       totalForceX += magnitude * (distanceVector.getX()) / distanceVector.magnitude();
       totalForceY += magnitude * (distanceVector.getY()) / distanceVector.magnitude();
     }
 
-    return new Point2D(totalForceX, totalForceY);
+    return new Coordinates(totalForceX, totalForceY);
   }
 
   private static double forceMagnitude(final double epsilon, final double rm, final double r) {

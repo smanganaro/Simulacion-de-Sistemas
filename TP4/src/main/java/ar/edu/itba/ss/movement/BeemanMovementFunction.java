@@ -1,10 +1,10 @@
-package ar.edu.itba.ss.LennardJones.movement;
+package ar.edu.itba.ss.movement;
 
 import static java.util.Objects.requireNonNull;
 
-import ar.edu.itba.ss.LennardJones.core.Neighbour;
-import javafx.geometry.Point2D;
-import ar.edu.itba.ss.LennardJones.core.Particle;
+import ar.edu.itba.ss.core.Neighbour;
+import ar.edu.itba.ss.core.Coordinates;
+import ar.edu.itba.ss.core.Particle;
 
 import java.util.Collections;
 import java.util.Set;
@@ -12,11 +12,11 @@ import java.util.function.BiFunction;
 
 public class BeemanMovementFunction implements MovementFunction {
 
-  private final BiFunction<Particle, Set<Neighbour>, Point2D> forceFunction;
-  private Point2D previousAcceleration;
+  private final BiFunction<Particle, Set<Neighbour>, Coordinates> forceFunction;
+  private Coordinates previousAcceleration;
 
-  public BeemanMovementFunction(final BiFunction<Particle, Set<Neighbour>, Point2D> forceFunction,
-      final Point2D previousAcceleration) {
+  public BeemanMovementFunction(final BiFunction<Particle, Set<Neighbour>, Coordinates> forceFunction,
+      final Coordinates previousAcceleration) {
 
     this.forceFunction = forceFunction;
     this.previousAcceleration = previousAcceleration;
@@ -25,10 +25,10 @@ public class BeemanMovementFunction implements MovementFunction {
   @Override
   public Particle move(final Particle currentParticle, final Set<Neighbour> neighbours, final double dt) {
 
-    final Point2D currentAcceleration = forceFunction.apply(currentParticle, neighbours)
+    final Coordinates currentAcceleration = forceFunction.apply(currentParticle, neighbours)
         .multiply(1.0 / currentParticle.getMass());
 
-    final Point2D predictedPosition = currentParticle.getPosition()
+    final Coordinates predictedPosition = currentParticle.getPosition()
         .add(currentParticle.getVelocity()
             .multiply(dt))
         .add(currentAcceleration
@@ -39,10 +39,10 @@ public class BeemanMovementFunction implements MovementFunction {
     final Particle predictedParticle = new Particle(currentParticle.getID(),predictedPosition,currentParticle.getRadius(),currentParticle.getMass(),
             currentParticle.getVelocity(), Collections.emptyList());
 
-    final Point2D predictedAcceleration = forceFunction.apply(predictedParticle, neighbours)
+    final Coordinates predictedAcceleration = forceFunction.apply(predictedParticle, neighbours)
         .multiply(1.0 / predictedParticle.getMass());
 
-    final Point2D predictedVelocity = currentParticle.getVelocity()
+    final Coordinates predictedVelocity = currentParticle.getVelocity()
         .add(predictedAcceleration
             .multiply(dt / 3.0))
         .add(currentAcceleration

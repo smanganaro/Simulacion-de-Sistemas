@@ -1,4 +1,4 @@
-package ar.edu.itba.ss.LennardJones.core;
+package ar.edu.itba.ss.core;
 
 import java.util.Objects;
 

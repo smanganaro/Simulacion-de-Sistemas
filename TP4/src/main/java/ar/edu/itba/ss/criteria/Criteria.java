@@ -1,6 +1,6 @@
-package ar.edu.itba.ss.LennardJones.criteria;
+package ar.edu.itba.ss.criteria;
 
-import ar.edu.itba.ss.LennardJones.core.Particle;
+import ar.edu.itba.ss.core.Particle;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

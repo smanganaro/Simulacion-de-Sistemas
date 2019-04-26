@@ -1,11 +1,11 @@
 package ar.edu.itba.ss.LennardJones;
 
-import ar.edu.itba.ss.LennardJones.movement.MovementFunction;
-import ar.edu.itba.ss.LennardJones.core.neigbour.CellIndexMethod;
-import ar.edu.itba.ss.LennardJones.core.Neighbour;
-import ar.edu.itba.ss.LennardJones.criteria.Criteria;
-import javafx.geometry.Point2D;
-import ar.edu.itba.ss.LennardJones.core.Particle;
+import ar.edu.itba.ss.core.neigbour.CellIndexMethod;
+import ar.edu.itba.ss.movement.MovementFunction;
+import ar.edu.itba.ss.core.Neighbour;
+import ar.edu.itba.ss.criteria.Criteria;
+import ar.edu.itba.ss.core.Coordinates;
+import ar.edu.itba.ss.core.Particle;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -18,7 +18,7 @@ public class Simulation {
   private final double boxWidth;
   private final double boxHeight;
   private final double middleGap;
-  private final CellIndexMethod cim;
+  private final double L;
   private final double rc;
   private final Map<Particle, MovementFunction> movementFunctions;
 
@@ -33,7 +33,7 @@ public class Simulation {
     this.boxHeight = boxHeight;
     this.middleGap = middleGap;
     this.rc = rc;
-    this.cim = new CellIndexMethod(Math.max(boxHeight, boxWidth), false);
+    this.L = Math.max(boxHeight, boxWidth);
     this.movementFunctions = movementFunctions;
   }
 
@@ -43,8 +43,8 @@ public class Simulation {
     List<Particle> particles = initialParticles;
 
     while (!endCriteria.test(time, particles)) {
-      Map<Particle, Set<Neighbour>> neighbours = cim
-          .apply(particles, particles.get(0).getRadius(), rc);
+      CellIndexMethod cellIndexMethod = new CellIndexMethod(particles,L, rc, particles.get(0).getRadius(), false);
+      Map<Particle, Set<Neighbour>> neighbours = cellIndexMethod.getParticlesMapped();
       particles = nextParticles(neighbours);
 
       if (iteration == writerIteration) {
@@ -101,11 +101,11 @@ public class Simulation {
     if (particle.getPosition().getX() == boxWidth / 2 && distanceToMiddleWall <= rc
             && distanceToMiddleWall >= 0) {
 //      neighbours.add(new Neighbour(ImmutableParticle.builder()
-//          .id(wallId--).position(new Point2D(boxWidth / 2, gapEnd))
+//          .id(wallId--).position(new Coordinates(boxWidth / 2, gapEnd))
 //          .mass(Double.POSITIVE_INFINITY)
-//          .velocity(Point2D.ZERO).build(), distanceToMiddleWall));
+//          .velocity(Coordinates.ZERO).build(), distanceToMiddleWall));
     } else if (distanceToExtremeWall <= rc) {
-      Point2D c = new Point2D(particle.getPosition().getX(), boxHeight);
+      Coordinates c = new Coordinates(particle.getPosition().getX(), boxHeight);
       neighbours.add(new Neighbour(new Particle(wallId--,c,0,Double.POSITIVE_INFINITY,Collections.emptyList()), distanceToExtremeWall));
     }
 
@@ -115,11 +115,11 @@ public class Simulation {
     if (particle.getPosition().getX() == boxWidth / 2 && distanceToMiddleWall <= rc
             && distanceToMiddleWall >= 0) {
 //      neighbours.add(new Neighbour(ImmutableParticle.builder()
-//          .id(wallId--).position(new Point2D(boxWidth / 2, gapStart))
+//          .id(wallId--).position(new Coordinates(boxWidth / 2, gapStart))
 //          .mass(Double.POSITIVE_INFINITY)
-//          .velocity(Point2D.ZERO).build(), distanceToMiddleWall));
+//          .velocity(Coordinates.ZERO).build(), distanceToMiddleWall));
     } else if (distanceToExtremeWall <= rc) {
-      Point2D c = new Point2D(particle.getPosition().getX(), 0);
+      Coordinates c = new Coordinates(particle.getPosition().getX(), 0);
       neighbours.add(new Neighbour(new Particle(wallId--,c,0,Double.POSITIVE_INFINITY,Collections.emptyList()), distanceToExtremeWall));
     }
 
@@ -131,10 +131,10 @@ public class Simulation {
 //        && !(particle.velocity().getX() > 0 && particle.position().getY() > gapStart - 5
 //            && particle.position().getY() < gapEnd + 5)
     ) {
-      Point2D c = new Point2D(boxWidth / 2, particle.getPosition().getY());
+      Coordinates c = new Coordinates(boxWidth / 2, particle.getPosition().getY());
       neighbours.add(new Neighbour(new Particle(wallId--,c,0,Double.POSITIVE_INFINITY,Collections.emptyList()), distanceToMiddleWall));
     } else if (distanceToExtremeWall <= rc) {
-      Point2D c = new Point2D(0, particle.getPosition().getY());
+      Coordinates c = new Coordinates(0, particle.getPosition().getY());
       neighbours.add(new Neighbour(new Particle(wallId--,c,0,Double.POSITIVE_INFINITY,Collections.emptyList()), distanceToExtremeWall));
     }
 
@@ -146,18 +146,18 @@ public class Simulation {
 //        && !(particle.velocity().getX() < 0 && particle.position().getY() > gapStart - 0.005
 //            && particle.position().getY() < gapEnd + 0.005)
     ) {
-      Point2D c = new Point2D(boxWidth / 2, particle.getPosition().getY());
+      Coordinates c = new Coordinates(boxWidth / 2, particle.getPosition().getY());
       neighbours.add(new Neighbour(new Particle(wallId--,c,0,Double.POSITIVE_INFINITY, Collections.emptyList()), distanceToMiddleWall));
     } else if (distanceToExtremeWall <= rc) {
-      Point2D c = new Point2D(boxWidth, particle.getPosition().getY());
+      Coordinates c = new Coordinates(boxWidth, particle.getPosition().getY());
       neighbours.add(new Neighbour(new Particle(wallId--,c,0,Double.POSITIVE_INFINITY,Collections.emptyList()), distanceToExtremeWall));
     }
 
     if (particle.getPosition().getY() > gapStart && particle.getPosition().getY() < gapEnd) {
-      final Point2D gapStartPosition = new Point2D(boxWidth / 2, gapStart);
-      final Point2D gapEndPosition = new Point2D(boxWidth / 2, gapEnd);
-      final double gapStartDistance = particle.getPosition().distance(gapStartPosition);
-      final double gapEndDistance = particle.getPosition().distance(gapEndPosition);
+      final Coordinates gapStartPosition = new Coordinates(boxWidth / 2, gapStart);
+      final Coordinates gapEndPosition = new Coordinates(boxWidth / 2, gapEnd);
+      final double gapStartDistance = particle.getPosition().getDistance(gapStartPosition);
+      final double gapEndDistance = particle.getPosition().getDistance(gapEndPosition);
 
       if (gapStartDistance <= rc) {
         neighbours.add(new Neighbour(new Particle(wallId--,gapStartPosition,0,Double.POSITIVE_INFINITY,Collections.emptyList()), gapStartDistance));

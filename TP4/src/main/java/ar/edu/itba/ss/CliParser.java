@@ -56,21 +56,9 @@ public class CliParser {
                     fps = Integer.parseInt(cmd.getOptionValue("fps"));
                 }
 
-                Configuration config = new Configuration(tf, dt, fps);
+
                 LennardWrapper.runBeemanTime(20);
                 exit(0);
-            }
-
-            Configuration config = new Configuration(k, mass, gamma, tf, r, dt);
-            switch (algorithm){
-                case "gp":
-                    return new GearPredictor(config);
-                case "bm":
-                    return new Beeman(config);
-                case "ve":
-                    return new Verlet(config);
-                default:
-                    throw new IllegalStateException("No algorithm available");
             }
 
         }catch (Exception e){

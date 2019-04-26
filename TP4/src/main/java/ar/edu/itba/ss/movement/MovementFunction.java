@@ -1,7 +1,7 @@
-package ar.edu.itba.ss.LennardJones.movement;
+package ar.edu.itba.ss.movement;
 
-import ar.edu.itba.ss.LennardJones.core.Neighbour;
-import ar.edu.itba.ss.LennardJones.core.Particle;
+import ar.edu.itba.ss.core.Neighbour;
+import ar.edu.itba.ss.core.Particle;
 import java.util.Set;
 
 public interface MovementFunction {

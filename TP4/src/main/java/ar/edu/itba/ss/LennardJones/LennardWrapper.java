@@ -1,17 +1,17 @@
 package ar.edu.itba.ss.LennardJones;
 
 
-import ar.edu.itba.ss.LennardJones.core.ParticleGenerator;
-import ar.edu.itba.ss.LennardJones.movement.BeemanMovementFunction;
-import ar.edu.itba.ss.LennardJones.movement.EulerMovementFunction;
-import ar.edu.itba.ss.LennardJones.movement.LennardJonesForceFunction;
-import ar.edu.itba.ss.LennardJones.movement.MovementFunction;
-import ar.edu.itba.ss.LennardJones.core.neigbour.CellIndexMethod;
-import ar.edu.itba.ss.LennardJones.core.Neighbour;
-import ar.edu.itba.ss.LennardJones.core.Particle;
-import ar.edu.itba.ss.LennardJones.criteria.Criteria;
-import ar.edu.itba.ss.LennardJones.criteria.TimeCriteria;
-import javafx.geometry.Point2D;
+import ar.edu.itba.ss.core.ParticleGenerator;
+import ar.edu.itba.ss.core.neigbour.CellIndexMethod;
+import ar.edu.itba.ss.movement.BeemanMovementFunction;
+import ar.edu.itba.ss.movement.EulerMovementFunction;
+import ar.edu.itba.ss.movement.forces.LennardJonesForceFunction;
+import ar.edu.itba.ss.movement.MovementFunction;
+import ar.edu.itba.ss.core.Neighbour;
+import ar.edu.itba.ss.core.Particle;
+import ar.edu.itba.ss.criteria.Criteria;
+import ar.edu.itba.ss.criteria.TimeCriteria;
+import ar.edu.itba.ss.core.Coordinates;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -35,9 +35,7 @@ public class LennardWrapper {
   private static final double EPSILON = 2;
   private static final double RM = 1;
 
-  private static final BiFunction<Particle, Set<Neighbour>, Point2D> FORCE_FUNCTION = new LennardJonesForceFunction(EPSILON, RM);
-
-  private static final CellIndexMethod cellIndexMethod = new CellIndexMethod(Math.max(BOX_HEIGHT, BOX_WIDTH), false);
+  private static final BiFunction<Particle, Set<Neighbour>, Coordinates> FORCE_FUNCTION = new LennardJonesForceFunction(EPSILON, RM);
 
   public static void runBeemanTime(double time) {
     List<Particle> previousParticles = new ParticleGenerator(RADIUS,MASS,INITIAL_VELOCITY_MAGNITUDE).generateParticles(N,BOX_WIDTH/2,BOX_HEIGHT);
@@ -46,7 +44,8 @@ public class LennardWrapper {
                     p.getVelocity(), Collections.emptyList()))
             .collect(Collectors.toList());
 
-    final Map<Particle, Set<Neighbour>> previousNeighbours = cellIndexMethod.apply(previousParticles, previousParticles.get(0).getRadius(), RC);
+    final CellIndexMethod cellIndexMethod = new CellIndexMethod(previousParticles, Math.max(BOX_HEIGHT, BOX_WIDTH),RC, previousParticles.get(0).getRadius(), false);
+    final Map<Particle, Set<Neighbour>> previousNeighbours = cellIndexMethod.getParticlesMapped();
 
     final List<Particle> currentParticles = new ArrayList<>(previousParticles.size());
     final Map<Particle, MovementFunction> movementFunctions = new HashMap<>(previousParticles.size());
@@ -67,7 +66,7 @@ public class LennardWrapper {
       final Map<Particle, Set<Neighbour>> previousNeighbours, final List<Particle> currentParticles,
       final Map<Particle, MovementFunction> movementFunctions) {
     for (final Particle previousParticle : previousParticles) {
-      final Point2D previousAcceleration = FORCE_FUNCTION
+      final Coordinates previousAcceleration = FORCE_FUNCTION
           .apply(previousParticle, previousNeighbours.get(previousParticle))
           .multiply(1.0 / previousParticle.getMass());
 
